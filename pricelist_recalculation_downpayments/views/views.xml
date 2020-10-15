@@ -14,7 +14,7 @@
                 </group>
                 <footer>
 
-                    <button name="create_interest_sale_order_lines" type="object" string="Recalcular"/>
+                    <button name="create_interest_sale_order_lines" class="btn btn-primary" type="object" string="Recalcular"/>
                     <button string="Cancel" class="btn-secondary" special="cancel"/>
 
                 </footer>
