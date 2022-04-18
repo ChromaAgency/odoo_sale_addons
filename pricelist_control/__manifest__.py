@@ -28,6 +28,7 @@
 
     # always loaded
     'data': [
+        'views/sale.order.xml'
     ],
     # only loaded in demonstration mode
     'demo': [
