@@ -7,6 +7,7 @@
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
             <button id="action_confirm" attrs="{'invisible': [('state', 'not in', ['sent'])]}" position="replace">
+                <field name="needs_manager_approval" invisible="1" />
                 <button name="action_confirm" id="action_confirm" string="Confirm" class="btn-primary" type="object" attrs="{'invisible': ['|',('state', 'not in', ['sent']),('needs_manager_approval','==',True)]}"/>
             </button>
             <button name="action_confirm" attrs="{'invisible': [('state', 'not in', ['draft'])]}" position="replace">
