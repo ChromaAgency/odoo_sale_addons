@@ -40,5 +40,5 @@ class SaleOrder(Model):
             
     def action_confirm(self):
         if self.needs_manager_approval:
-            raise UserError('Los precios no son los mismos que la lista de precios, por favor revisarlos o pedir aprobación de un gerente.')
+            raise UserError('Los precios no son los mismos que la lista de precios, por favor revisarlos o pida la aprobación de un gerente.')
         return super().action_confirm()
