@@ -9,7 +9,8 @@ class CustomerPointCategorization(Model):
     score = Integer(string="Puntaje", required=True)
     weight = Integer(string="Peso", related="name.weight")
     weighted_score = Integer(string="weighted_score", compute="_compute_weighted_score", store=True)
-
+    partner_id = Many2one('res.partner', string="Cliente")
+    
     @depends('score', 'weight', 'name.weight')
     def _compute_weighted_score(self):
         for rec in self:
