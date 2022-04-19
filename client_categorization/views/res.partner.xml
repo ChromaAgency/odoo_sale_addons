@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_partner_form_client_categorization" model="ir.ui.view">
+        <field name="name">res.partner.view.form.inherit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <field name="email" position="after">
+                <field name="customer_score" />
+                <field name="customer_point_ids">
+                    <tree editable="bottom">
+                        <field name="name" />
+                        <field name="points" />
+                    </tree>
+                </field>
+                <field name="customer_point_type_id" />
+            </field>
+        </field>
+    </record>
+
+</odoo>
