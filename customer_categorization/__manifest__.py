@@ -24,11 +24,12 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','sale'],
+    'depends': ['base','contacts','sale'],
 
     # always loaded
     'data': [
         'views/res.partner.xml',
+        'views/customer.categorization.xml',
         'security/ir.model.access.csv',
     ],
     # only loaded in demonstration mode
