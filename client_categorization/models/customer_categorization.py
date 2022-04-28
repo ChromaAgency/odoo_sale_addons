@@ -4,6 +4,7 @@ from odoo.api import depends
 
 class CustomerPointCategorization(Model):
     _name = "customer.point.categorization"
+    _description = "Puntos para definición de tipo"
     
     name = Many2one('customer.point.categorization.category', string="Concepto", required=True)
     score = Integer(string="Puntaje", required=True)
@@ -19,6 +20,7 @@ class CustomerPointCategorization(Model):
 
 class CustomerPointCategorizationCategory(Model):
     _name = "customer.point.categorization.category"
+    _description = "Categorias para puntaje de cliente"
 
     name = Char(string="Nombre", required=True)
     weight = Integer(string="Peso", required=True)
