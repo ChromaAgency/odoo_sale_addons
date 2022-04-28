@@ -12,7 +12,9 @@ class CustomerPointCategorizationType(Model):
     min_points = Integer(string="Puntos minimos", required=True)
 
     def _get_type_with_highest_min_points(self):
-        highest_min_point = max(self.mapped('min_points'))
+        points = self.mapped('min_points')
+        points.append(0)
+        highest_min_point = max(points)
         highest_min_points_rec = self.filtered(lambda r: r.min_points == highest_min_point)
         return highest_min_points_rec[:1]
 
