@@ -30,6 +30,7 @@
     'data': [
         'views/res.partner.xml',
         'views/customer.categorization.xml',
+        'views/product.pricelist.xml',
         'security/ir.model.access.csv',
     ],
     # only loaded in demonstration mode
