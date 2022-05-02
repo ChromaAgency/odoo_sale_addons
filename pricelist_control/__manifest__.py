@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "Monto faltante en lista de precio",
+    'name': "Control de listas de precios",
 
     'summary': """
                 Avoid salesman from changing pricelists.
