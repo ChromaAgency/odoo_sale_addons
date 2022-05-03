@@ -13,7 +13,7 @@
             </button>
             <button name="action_confirm" attrs="{'invisible': [('state', 'not in', ['draft'])]}" position="replace">
                 <button name="action_confirm" string="Confirm" type="object" attrs="{'invisible': ['|',('state', 'not in', ['draft']),('needs_manager_approval','==',True)]}"/>
-                <button name="action_confirm" string="Confirm" class="btn-primary" type="object" attrs="{'invisible': ['|', ('state', 'in', ['draft','sent']), ('needs_manager_approval','!=',True)]}" groups="sales_team.group_sale_manager"/>
+                <button name="action_confirm" string="Confirm" class="btn-primary" type="object" attrs="{'invisible': ['|',('state','not in', ['draft','sent']),'&amp;', ('state', 'in', ['draft','sent']), ('needs_manager_approval','!=',True)]}" groups="sales_team.group_sale_manager"/>
             </button>
             <field name="pricelist_id" position="attributes">
                 <attribute name="readonly">True</attribute>

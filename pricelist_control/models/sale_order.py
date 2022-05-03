@@ -52,6 +52,6 @@ class SaleOrder(Model):
             rec.needs_manager_approval = any(rec.order_line.mapped('not_aligned_with_pricelist')) or rec.show_update_pricelist
             
     def action_confirm(self):
-        if self.needs_manager_approval and not self.env.ref('sales_team.group_sale_manager').id in self.env.user.groups_id.ids and self.env.user.id != self.env.ref('base.user_root').id:
+        if self.needs_manager_approval and (not self.env.ref('sales_team.group_sale_manager').id in self.env.user.groups_id.ids or self.env.user.id == self.env.ref('base.user_root').id):
             raise UserError('Los precios no son los mismos que la lista de precios, por favor revisarlos o pida la aprobación de un gerente.')
         return super().action_confirm()
