@@ -33,7 +33,7 @@ class SaleOrderLine(Model):
                 new_list_price = currency._convert(
                     new_list_price, self.order_id.pricelist_id.currency_id,
                     self.order_id.company_id or self.env.company, self.order_id.date_order or fields.Date.today())
-            discount = (new_list_price - price) / new_list_price * 100
+            discount = ((new_list_price - price) / (new_list_price or 1)) * 100
             if self.price_unit == pricelist_price_unit and discount == self.discount:
                 return False
         if self.order_id.pricelist_id.discount_policy == 'with_discount':
