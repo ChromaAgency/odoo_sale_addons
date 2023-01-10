@@ -12,7 +12,8 @@
                         <field name="delivery_time_ids" >
                             <tree editable="bottom">
                                 <field name="name" />
-                                <field name="day" />
+                                <field name="day_from" />
+                                <field name="day_to" />
                                 <field name="hour_from"/>
                                 <field name="minute_from"/>
                                 <field name="hour_to"/>
@@ -24,11 +25,12 @@
                 <page name="recception_times" string="Horarios de recepción" attrs="{'invisible': [('parent_id','!=',False)]}">
                     <field name="reception_time_ids" >
                         <tree editable="bottom">
-                            <field name="day" />
+                            <field name="day_from" />
+                            <field name="day_to" />
                             <field name="hour_from"/>
                             <field name="minute_from"/>
                             <field name="hour_to"/>
-                                <field name="minute_to"/>
+                            <field name="minute_to"/>
                         </tree>
                     </field>
                 </page>

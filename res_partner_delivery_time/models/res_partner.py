@@ -1,5 +1,4 @@
 from calendar import FRIDAY, MONDAY, SATURDAY, SUNDAY, THURSDAY, TUESDAY, WEDNESDAY
-import calendar
 from datetime import date, datetime, timedelta
 from odoo import fields, models  
 days_by_int_weekday = {
@@ -16,15 +15,17 @@ HOURS_OPTIONS = [(str(minute),str(minute)) for minute in range(0,24)]
 MINUTES_OPTIONS = [(str(minute),str(minute)) for minute in range(0,60)]
 NUMBER_OF_DAYS_IN_A_WEEK = 7
 def _filter_future_days_and_monday(r, weekday):
-    return int(r.day) > weekday
+    # TODO Change this to accept date range
+    return int(r.day_from) > weekday
 
 class ResPartnerTime(models.AbstractModel):
     _name = "res.partner.time"
-    _order = "day asc"
+    _order = "day_from asc"
 
     name = fields.Char(string="Dia hora y minutos", compute="_compute_name")
     partner_id = fields.Many2one("res.partner")
-    day = fields.Selection(DELIVERY_DAYS_OPTIONS, string = "Dia de entrega", required=True)
+    day_from = fields.Selection(DELIVERY_DAYS_OPTIONS, string = "Dia de entrega inicial", required=True)
+    day_to = fields.Selection(DELIVERY_DAYS_OPTIONS, string = "Dia de entrega final", required=True)
     #TODO Add a widger that makes it easier to see this and adapts it to TZ in frontend
     hour_from = fields.Selection(HOURS_OPTIONS, string="Hora", required=True)
     minute_from = fields.Selection(MINUTES_OPTIONS, string="Minutos", required=True)
@@ -33,7 +34,8 @@ class ResPartnerTime(models.AbstractModel):
 
     def _compute_name(self):
         for rec in self:
-            weekday = days_by_int_weekday.get(rec.day)
+            # TODO Change this to accept the date range
+            weekday = days_by_int_weekday.get(rec.day_from)
             rec.name = f"{weekday} {rec.hour_from:0>2}:{rec.minute_from:0>2} - {rec.hour_to:0>2}:{rec.minute_to:0>2}"
 
     @property
@@ -41,7 +43,8 @@ class ResPartnerTime(models.AbstractModel):
         self.ensure_one()
         now = datetime.now()
         weekday = now.isoweekday() - 1
-        difference_to_target_weekday = int(self.day) - weekday 
+        #TODO Take into account date range
+        difference_to_target_weekday = int(self.day_from) - weekday 
         if difference_to_target_weekday < 0:
             difference_to_target_weekday += NUMBER_OF_DAYS_IN_A_WEEK
         # ? When implementing this on frontend take this out
@@ -69,7 +72,6 @@ class ReceptionTime(models.Model):
 class ResPartners(models.Model):
     _inherit = "res.partner"
 
-    delivery_day = fields.Selection(DELIVERY_DAYS_OPTIONS, string = "Dia de entrega")
     delivery_time_ids = fields.One2many('res.partner.delivery_time', 'partner_id', string="Dias de entrega")
     reception_time_ids = fields.One2many('res.partner.reception_time', 'partner_id', string="Dias de recepción")
 
