@@ -22,8 +22,8 @@
 
     # always loaded
     'data': [
-        'security/ir.rule.xml',
         'security/res.groups.xml',
+        'security/ir.rule.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

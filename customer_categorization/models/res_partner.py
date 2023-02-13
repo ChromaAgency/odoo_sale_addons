@@ -12,7 +12,6 @@ class ResPartners(Model):
 
     @depends('customer_point_ids.weighted_score', 'customer_point_ids.weight')
     def _compute_customer_score(self):
-        _logger.info('changing customer_Score')
         for rec in self:
             customer_score = sum(rec.customer_point_ids.mapped('weighted_score'))
             rec.customer_point_type_id = rec.customer_point_type_id.get_customer_point_categorization_type(customer_score)
