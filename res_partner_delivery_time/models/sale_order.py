@@ -15,7 +15,7 @@ class SaleOrder(Model):
                 defaults.update({'commitment_date': self.env['res.partner'].browse([partner_id]).get_next_delivery_date()})
         return defaults
 
-    @onchange('partner_id', 'shipping_partner_id')
+    @onchange('partner_id', 'partner_shipping_id')
     def _onchange_partner_id_delivery_date(self):
         if self.partner_id:
             self.commitment_date = self.partner_id.get_next_delivery_date()
