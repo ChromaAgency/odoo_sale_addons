@@ -11,7 +11,8 @@ class SaleOrder(Model):
         defaults = super().default_get(fields_list)
         if 'partner_id' in defaults:
             partner_id = defaults.get("partner_id") 
-            defaults.update({'commitment_date': self.env['res.partner'].browse([partner_id]).get_next_delivery_date()})
+            if partner_id:
+                defaults.update({'commitment_date': self.env['res.partner'].browse([partner_id]).get_next_delivery_date()})
         return defaults
 
     @onchange('partner_id', 'shipping_partner_id')
