@@ -17,5 +17,6 @@ class SaleOrder(Model):
 
     @onchange('partner_id', 'shipping_partner_id')
     def _onchange_partner_id_delivery_date(self):
-        self.commitment_date = self.partner_id.get_next_delivery_date()
+        if self.partner_id:
+            self.commitment_date = self.partner_id.get_next_delivery_date()
         return {}
