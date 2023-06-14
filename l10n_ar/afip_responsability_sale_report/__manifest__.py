@@ -10,7 +10,7 @@
     'images': [
     ],
     'depends': ['sale', 'sale_management'],
-    'data': [],
+    'data': [ 'reports/sale.order.portal.template.xml' ],
     'demo': [
     ],
     'installable': True,
