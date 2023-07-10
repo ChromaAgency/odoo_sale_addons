@@ -9,7 +9,7 @@
     'license': 'AGPL-3',
     'images': [
     ],
-    'depends': ['sale', 'sale_management'],
+    'depends': ['sale', 'sale_management', 'account'],
     'data': [ 'reports/sale.order.portal.template.xml' ],
     'demo': [
     ],
