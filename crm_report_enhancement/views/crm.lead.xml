@@ -11,8 +11,6 @@
             <field name="commercial_partner_id" string="Entidad del cliente"/>
             <filter name="commercial_partner_id_group" string="Entidad del cliente" context="{'group_by': 'commercial_partner_id'}" />
             <separator />
-            <field name="customer_order_count" string="# de ordenes de cliente"/>
-            <separator />
         </separator>
     </field>
 </record>
