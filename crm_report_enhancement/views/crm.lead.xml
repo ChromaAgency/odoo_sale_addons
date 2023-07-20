@@ -2,5 +2,19 @@
 <odoo>
 
     
-
+<record id="crm_opportunity_report_view_search_inherit_crm_report_enhancement" model="ir.ui.view">
+    <field name="name">crm.lead.view.search.inherit</field>
+    <field name="model">crm.lead</field>
+    <field name="inherit_id" ref="crm.crm_opportunity_report_view_search"/>
+    <field name="arch" type="xml">
+        <separator position="after">
+            <field name="commercial_partner_id" string="Entidad del cliente"/>
+            <filter name="commercial_partner_id_group" string="Entidad del cliente" context="{'group_by': 'commercial_partner_id'}" />
+            <separator />
+            <field name="last_order_id" string="Último Pedido Confirmado"/>
+            <filter name="last_order_id_group" string="Último Pedido Confirmado" context="{'group_by': 'last_order_id'}" />
+            <separator />
+        </separator>
+    </field>
+</record>
 </odoo>
