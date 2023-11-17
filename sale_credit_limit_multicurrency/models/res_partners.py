@@ -1,7 +1,7 @@
 from odoo import _
 from odoo.models import Model 
 from odoo.fields import Many2one, Monetary, Date
-from odoo.api import depends_context
+from odoo.api import depends_context, depends
 
 class ResPartner(Model):
     _inherit = 'res.partner'
@@ -71,6 +71,7 @@ class ResPartner(Model):
         return draft_invoice_lines_amount
     
     @depends_context('company')
+    @depends('credit_limit_currency_id')
     def _compute_credit_with_confirmed_orders(self):
         # Sets 0 when use_partner_credit_limit is not set avoiding unnecessary overloads
         credit_with_confirmed_orders = 0
