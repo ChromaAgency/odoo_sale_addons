@@ -1,13 +1,14 @@
 from odoo import _
 from odoo.models import Model 
-from odoo.fields import Many2one, Date
+from odoo.fields import Many2one, Monetary, Date
 from odoo.api import depends_context
 
 class ResPartner(Model):
     _inherit = 'res.partner'
 
     credit_limit_currency_id = Many2one('res.currency', string="Moneda del limite de credito", default=lambda s: s.env.company.currency_id)
-    
+    credit_with_confirmed_orders = Monetary(currency_field='credit_limit_currency_id')
+
     def _get_confirmed_order_lines(self):
         domain = [
                     ('order_id.partner_id.commercial_partner_id', '=', self.commercial_partner_id.id),
