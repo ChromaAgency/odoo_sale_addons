@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_credit_readonly_partner_form_inherit_sale_exception_cred_limit_dmd"
+        model="ir.ui.view">
+        <field name="name">res.partner.view.form.inherit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="sale_exception_credit_limit.view_credit_readonly_partner_form" />
+        <field name="arch" type="xml">
+            <field name="credit_limit" position="before">
+                <field name="credit_limit_currency_id" />
+            </field>
+        </field>
+    </record>
+
+</odoo>
