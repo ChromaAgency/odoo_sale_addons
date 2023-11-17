@@ -21,7 +21,7 @@ class SaleOrderLine(Model):
             self.order_id.date_order,
             'sale',
             fiscal_position=self.order_id.fiscal_position_id,
-            product_price_unit=self._get_display_price(self.product_id),
+            product_price_unit=self._get_display_price(),
             product_currency=self.order_id.currency_id
         )
         if self.order_id.pricelist_id.discount_policy == 'without_discount':
