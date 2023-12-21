@@ -48,7 +48,7 @@ class ResPartnerTime(models.AbstractModel):
         if difference_to_target_weekday < 0:
             difference_to_target_weekday += NUMBER_OF_DAYS_IN_A_WEEK
         # ? When implementing this on frontend take this out
-        return now.replace(hour=self.hour_to, minute=int(self.minute_to)) + timedelta(days=difference_to_target_weekday)
+        return now.replace(hour=int(self.hour_to), minute=int(self.minute_to)) + timedelta(days=difference_to_target_weekday)
 
     def get_most_recent_next_date(self):
         now = date.today()
