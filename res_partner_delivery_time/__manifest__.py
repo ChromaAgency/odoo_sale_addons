@@ -2,7 +2,7 @@
     'name': 'Dias y horas de entrega',
     'category': 'Stock',
     'summary': 'Dias y horas de entrega para tienda veggie.',
-    'version': '1.0',
+    'version': '17.1.0',
     'depends': ['base','sale'],
     'author': 'Making Argentina.',
     'website': 'https://www.making.com.ar',
