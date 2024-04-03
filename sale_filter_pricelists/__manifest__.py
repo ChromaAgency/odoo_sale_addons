@@ -1,6 +1,6 @@
 {
     'name': 'Filtros de listas de precios',
-    'version': "0.1.0",
+    'version': "17.0.1.0",
     'category': 'Sales',
     'sequence': 1,
     'summary': '',

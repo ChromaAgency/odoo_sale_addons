@@ -19,7 +19,7 @@
 ##############################################################################
 {
     'name': 'Sale Exception Credit Limit for dmd',
-    'version': "1.1.0.0",
+    'version': "17.0.1.1.0",
     'author': 'Making',
     'website': 'https://www.making.com.ar',
     'license': 'AGPL-3',
