@@ -7,8 +7,9 @@ class CustomerPointCategorizationType(Model):
     _name = "customer.point.categorization.type"
     _description = "Tipo de cliente"
     _order = "min_points desc"
+    _rec_name= "category_name"
 
-    name = Char(string="Nombre", required=True)
+    category_name = Char(string="Nombre", required=True)
     min_points = Integer(string="Puntos minimos", required=True)
 
     def _get_type_with_highest_min_points(self):
