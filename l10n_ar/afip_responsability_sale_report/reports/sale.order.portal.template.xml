@@ -40,12 +40,12 @@
                 <t t-set="current_subtotal" t-value="current_subtotal + line.price_total"
                     t-if="not display_taxes" />
             </xpath>
-            <t t-call="account.document_tax_totals" position="attributes">
+            <t t-call="sale.document_tax_totals" position="attributes">
                 <attribute name="t-call">afip_responsability_sale_report.document_tax_totals</attribute>
             </t>
         </template>
 
-        <template id="document_tax_totals" inherit_id="account.document_tax_totals" primary="True">
+        <template id="document_tax_totals" inherit_id="sale.document_tax_totals" primary="True">
             <xpath expr="//t[@t-foreach]" position="attributes">
                 <attribute name="t-if">not doc._l10n_ar_include_vat()</attribute>
             </xpath>
@@ -55,7 +55,7 @@
             name="sale_order_portal_content_totals_table"
             inherit_id="sale.sale_order_portal_content_totals_table">
 
-            <t t-call="account.document_tax_totals" position="attributes">
+            <t t-call="#{sale_order._get_name_tax_totals_view()}" position="attributes">
                 <attribute name="t-call">afip_responsability_sale_report.document_tax_totals</attribute>
             </t>
 
@@ -75,7 +75,7 @@
             <xpath expr="//t[@t-foreach='lines_to_report']/tr/t/td[5]" position="attributes">
                 <attribute name="t-if">display_taxes</attribute>
             </xpath>
-            <xpath expr="//tbody[@class='sale_tbody']/t[3]/tr/t/td[3]" position="replace">
+            <xpath expr="//tbody[hasclass('sale_tbody')]/t[3]/tr/t/td[3]" position="replace">
                 <t t-set="discount_rate" t-value="1-(line.discount/100)" />
                 <t t-set="price_with_discount" t-value="discount_rate * line.price_unit" />
                 <t t-set="tax_per_unit" t-value="line.price_tax/line.product_uom_qty" />
@@ -121,14 +121,14 @@
                 <t t-set="current_subtotal" t-value="current_subtotal + line.price_subtotal"
                     t-if="display_taxes" />
             </xpath>
-            <xpath expr="//tbody[@class='sale_tbody']/t[3]/t[2]" position="replace">
+            <!-- <xpath expr="//tbody[@class='sale_tbody']/t[3]/t[2]" position="replace">
                 <t t-set="current_subtotal" t-value="current_subtotal + line.price_total"
                     t-if="not display_taxes" />
-            </xpath>
+            </xpath> -->
         </template>
         <template id="sale_order_portal_template" inherit_id="sale.sale_order_portal_template">
 
-            <xpath expr="//h2[@class='mb-0']" position="replace">
+            <xpath expr="//h2[@data-id='total_amount']" position="replace">
                 <t t-set="doc" t-value="sale_order" />
                 <t t-set="display_taxes" t-value="not doc._l10n_ar_include_vat()" />
                 <h2 class="mb-0" t-if="display_taxes">

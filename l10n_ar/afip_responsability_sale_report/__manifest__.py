@@ -1,6 +1,6 @@
 {
     'name': 'Presupuestos y pedidos de venta basados en Responsabilidad de AFIP',
-    'version': "1.0.0",
+    'version': "17.1.0",
     'category': 'Localization',
     'sequence': 1,
     'summary': '',
