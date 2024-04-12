@@ -9,7 +9,7 @@
     'license': 'AGPL-3',
     'images': [
     ],
-    'depends': ['product', 'sale'],
+    'depends': ['product', 'sale','sale_management'],
     'data': [
         'views/res.partner.xml',
         'views/sale.order.xml'
