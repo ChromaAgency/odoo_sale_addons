@@ -9,8 +9,8 @@
                     <field name="pricelist_id" />
                     <field name="recalculation_method" />
                     <field name="percentage_overcharge" />
-                    <field name="amount" attrs="{'invisible':[('recalculation_method','!=','fixed')]}"/>
-                    <field name="product_id" attrs="{'invisible':1}"/>
+                    <field name="amount" invisible="recalculation_method != 'fixed'"/>
+                    <field name="product_id" invisible="1"/>
                 </group>
                 <footer>
 
