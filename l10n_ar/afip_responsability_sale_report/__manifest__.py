@@ -9,8 +9,8 @@
     'license': 'AGPL-3',
     'images': [
     ],
-    'depends': ['sale', 'sale_management', 'account'],
-    'data': [ 'reports/sale.order.portal.template.xml','l10n_ar' ],
+    'depends': ['sale', 'sale_management', 'account' ,'l10n_ar'],
+    'data': [ 'reports/sale.order.portal.template.xml' ],
     'demo': [
     ],
     'installable': True,
