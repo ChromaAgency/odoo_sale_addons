@@ -17,9 +17,16 @@
                     <t t-set="discount_rate" t-value="1-(line.discount/100)" />
                     <t t-set="tax_per_unit" t-value="line.price_tax/line.product_uom_qty" />
                     <span class="td_priceunit">
-                        <t t-esc="line.price_unit + (tax_per_unit/discount_rate)"
+                        <t t-if="discount_rate != 0">
+                            <t t-esc="line.price_unit + (tax_per_unit/discount_rate)"
                             t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;decimal_precision&quot;: &quot;Product Price&quot;}"
                             t-if="not display_taxes" />
+                        </t>
+                        <t t-else="">
+                            <t t-esc="line.price_unit + tax_per_unit"
+                            t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;decimal_precision&quot;: &quot;Product Price&quot;}"
+                            t-if="not display_taxes" />
+                        </t>
                     </span>
                     <span>
                         <t t-esc="line.price_unit" t-if="display_taxes" />
@@ -76,7 +83,7 @@
                 <attribute name="t-if">display_taxes</attribute>
             </xpath>
             <xpath expr="//tbody[@class='sale_tbody']/t[3]/tr/t/td[3]" position="replace">
-                <t t-set="discount_rate" t-value="1-(line.discount/100) if line.discount else 1" />
+                <t t-set="discount_rate" t-value="1-(line.discount/100)" />
                 <t t-set="price_with_discount" t-value="discount_rate * line.price_unit" />
                 <t t-set="tax_per_unit" t-value="line.price_tax/line.product_uom_qty" />
                 <td
@@ -94,10 +101,18 @@
                 <td
                     t-attf-class="text-end {{ 'd-none d-sm-table-cell' if report_type == 'html' else '' }}"
                     t-else="">
-                    <div t-out="line.price_unit  + (tax_per_unit/discount_rate)"
+                    <t t-if="discount_rate != 0">
+                        <div t-out="line.price_unit  + (tax_per_unit/discount_rate)"
+                            t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;decimal_precision&quot;: &quot;Product Price&quot;}"
+                            t-att-style="line.discount and 'text-decoration: line-through' or None"
+                            t-att-class="(line.discount and 'text-danger' or '') + ' text-end'" />
+                    </t>
+                    <t t-else="">
+                        <div t-out="line.price_unit + tax_per_unit" 
                         t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;decimal_precision&quot;: &quot;Product Price&quot;}"
                         t-att-style="line.discount and 'text-decoration: line-through' or None"
-                        t-att-class="(line.discount and 'text-danger' or '') + ' text-end'" />
+                        t-att-class="(line.discount and 'text-danger' or '') + ' text-end'"/>
+                    </t>
                     <div t-if="line.discount">
                         <t t-out="price_with_discount + tax_per_unit"
                             t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;decimal_precision&quot;: &quot;Product Price&quot;}" />
