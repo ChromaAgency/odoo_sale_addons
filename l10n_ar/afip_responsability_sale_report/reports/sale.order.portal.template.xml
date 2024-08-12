@@ -76,7 +76,7 @@
                 <attribute name="t-if">display_taxes</attribute>
             </xpath>
             <xpath expr="//tbody[@class='sale_tbody']/t[3]/tr/t/td[3]" position="replace">
-                <t t-set="discount_rate" t-value="1-(line.discount/100)" />
+                <t t-set="discount_rate" t-value="1-(line.discount/100) if line.discount else 1" />
                 <t t-set="price_with_discount" t-value="discount_rate * line.price_unit" />
                 <t t-set="tax_per_unit" t-value="line.price_tax/line.product_uom_qty" />
                 <td
