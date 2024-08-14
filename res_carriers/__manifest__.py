@@ -15,8 +15,8 @@ Allows you to vinculate delivery methods to partners.
     'data': [
         'security/ir.model.access.csv',
         'views/delivery_view.xml',
-        'views/res.partner.xml'
-        'views/stock.picking.xml'
+        'views/res.partner.xml',
+        'views/stock.picking.xml',
     ],
     'demo': [],
     'installable': True,
