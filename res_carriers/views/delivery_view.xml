@@ -11,11 +11,11 @@
                 <tree string="Expresos">
                     <field name="sequence" widget="handle"/>
                     <field name="name"/>
-                    <field name="razon_social"/>
-                    <field name="direccion"/>
-                    <field name="ciudad"/>
-                    <field name="telefono"/>
-                    <field name="movil"/>
+                    <field name="company_name"/>
+                    <field name="street"/>
+                    <field name="city"/>
+                    <field name="phone"/>
+                    <field name="mobile"/>
                     <field name="email"/>
                 </tree>
             </field>
@@ -48,14 +48,14 @@
                         <group>
                             <group name="domicilio">
                                 <field name="active"/>
-                                <field name="direccion" placeholder="Dirección" string="Domicilio"/>
-                                <field name="ciudad" placeholder="Ciudad"/>
+                                <field name="street" placeholder="Dirección" string="Domicilio"/>
+                                <field name="city" placeholder="Ciudad"/>
                                 <field name="state_id" />
                                 <field name="zip" />
                             </group>
                             <group name="contacto">
-                                <field name="telefono"/>
-                                <field name="movil"/>
+                                <field name="phone"/>
+                                <field name="mobile"/>
                                 <field name="email"/>
                             </group>
                         </group>
