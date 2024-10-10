@@ -29,7 +29,7 @@ class res_Carrier(models.Model):
     @depends('street', 'city', 'state_id', 'zip', 'country_id')
     def _compute_complete_address(self):
         for carrier in self:
-            carrier.complete_address = ', '.join([carrier.street, carrier.city, carrier.state_id.name, carrier.zip, carrier.country_id.name])
+            carrier.complete_address = ', '.join([carrier.street, carrier.city, carrier.state_id.name if carrier.state_id else '', carrier.zip, carrier.country_id.name if carrier.country_id else ''])
 
     country_ids = fields.Many2many('res.country', 'res_carrier_country_rel', 'carrier_id', 'country_id', 'Countries') # is this a nonesense?
     state_ids = fields.Many2many('res.country.state', 'res_carrier_state_rel', 'carrier_id', 'state_id', 'States')
