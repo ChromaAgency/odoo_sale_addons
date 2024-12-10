@@ -9,10 +9,10 @@
     'description': """
     """,
 
-    'author': "Making Argentina",
+    'author': "Chroma",
     'installable': True,
     'application':True,
-    'website': "http://www.making.com.ar",
+    'website': "https://chroma.agency",
 
     # Categories can be used to filter modules in modules listing
     # Check https://github.com/odoo/odoo/blob/13.0/odoo/addons/base/data/ir_module_category_data.xml

@@ -12,7 +12,7 @@
     'author': "Chroma",
     'installable': True,
     'application':True,
-    'website': "http://www.making.com.ar",
+    'website': "https://chroma.agency",
 
     'category': 'Sales',
     'version': '18.0.1.1',
