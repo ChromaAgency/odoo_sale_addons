@@ -24,10 +24,10 @@
     <field name="name">customer.point.categorization.type.view.tree</field>
     <field name="model">customer.point.categorization.type</field>
     <field name="arch" type="xml">
-        <tree string="">
+        <list string="">
             <field name="category_name" />
             <field name="min_points" />
-        </tree>
+        </list>
     </field>
 </record>
 <menuitem
