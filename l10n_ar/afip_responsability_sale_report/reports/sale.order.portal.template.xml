@@ -127,7 +127,7 @@
                         t-if="not display_taxes" />
                 </td>
             </xpath>
-            <xpath expr="//div[@class='table-responsive']/table/thead/tr/th[5]"
+            <xpath expr="//th[@id='taxes_header']"
                 position="attributes">
                 <attribute name="t-if">display_taxes</attribute>
             </xpath>
