@@ -36,7 +36,4 @@
     # only loaded in demonstration mode
     'demo': [
     ],
-    'migrate': [
-        'migrations/migrate_category_name.py',
-    ],
 }
