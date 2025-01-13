@@ -11,7 +11,7 @@ Allows you to vinculate delivery methods to partners.
 ==============================================================
 
 """,
-    'depends': ["base", 'sale_stock', 'stock_delivery', 'sale_management'],
+    'depends': ["base", 'sale_stock', 'sale_management'],
     'data': [
         'security/ir.model.access.csv',
         'views/delivery_view.xml',
