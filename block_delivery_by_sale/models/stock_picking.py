@@ -17,7 +17,6 @@ class StockPicking(models.Model):
                 if not rec.sale_id.payment_term_id.cascade_payment_term_id and rec.scheduled_date:
                     rec.is_active_validate = rec.scheduled_date.date() <= fields.Date.today()
                 elif rec.sale_id.payment_term_id.cascade_payment_term_id and rec.sale_id.is_active_validate:
-                    _logger.info("sale order based true")
                     rec.is_active_validate = True
                 else:
                     rec.is_active_validate = False

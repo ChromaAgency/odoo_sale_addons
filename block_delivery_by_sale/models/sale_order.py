@@ -17,8 +17,7 @@ class SaleOrder(models.Model):
                         lambda inv: inv.is_down_payment_invoice and inv.state == 'posted'
                     )
                     if downpayment_invoices:
-                        _logger.info(downpayment_invoices)
-                        rec.is_active_validate = any(state == 'paid' for state in downpayment_invoices.mapped('payment_state'))
+                        rec.is_active_validate = any(state in ['paid','in_payment'] for state in downpayment_invoices.mapped('payment_state'))
             else:
                 rec.is_active_validate = False
 
