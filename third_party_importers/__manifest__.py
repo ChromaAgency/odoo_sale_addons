@@ -28,5 +28,6 @@
         'wizards/meli_sale_importer.xml',
         'wizards/tiendanube_sale_importer.xml',
         'wizards/woocommerce_sale_importer.xml',
+        'views/res.config.settings_views.xml',
     ]
 }
