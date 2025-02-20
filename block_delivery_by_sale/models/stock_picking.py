@@ -25,5 +25,13 @@ class StockPicking(models.Model):
     def _action_done(self):
         for picking in self:
             if picking.picking_type_id.code == 'outgoing' and not picking.is_active_validate:
-                raise UserError(_("The orders cannot be validated because the delivery %s is blocked.", picking.name))
+                raise UserError(_("Las ordenes no pueden validarse ya que la orden %s esta bloqueada.", picking.name))
+            if picking.picking_type_id.code == 'outgoing' and picking.sale_id.invoice_ids and not picking.sale_id.payment_term_id.cascade_payment_term_id:
+                picking._recompute_due_date(picking.sale_id.invoice_ids)
         return super(StockPicking, self)._action_done()
+    
+    def _recompute_due_date(self, invoices):
+        for invoice in invoices:
+            invoice.sudo()._compute_needed_terms()
+        
+

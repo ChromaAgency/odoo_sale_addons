@@ -9,7 +9,7 @@ class AccountMove(models.Model):
 
     is_down_payment_invoice = fields.Boolean(string="Is Downpayment Invoice")
 
-    def _obtain_recent_picking_date(self, invoice, date_reference):
+    def _obtain_recent_picking_date(self, invoice):
         order_ids = invoice.invoice_line_ids.filtered(lambda l: l.sale_line_ids).sale_line_ids.mapped('order_id')            
         if order_ids:
             valid_orders = order_ids.filtered(lambda o: o.is_active_validate and o.state in ['done', 'sale'])
@@ -23,15 +23,15 @@ class AccountMove(models.Model):
                     if completed_pickings:
                         latest_picking = max(completed_pickings, key=lambda p: p.date_done)
                         return latest_picking.date_done
-        return date_reference
+        return False
     
 
     @api.depends('invoice_payment_term_id', 'invoice_date', 'currency_id', 'amount_total_in_currency_signed', 'invoice_date_due')
     def _compute_needed_terms(self):
         for invoice in self:
-            date_reference = invoice.invoice_date or invoice.date or fields.Date.context_today(invoice)
-            if invoice.invoice_payment_term_id.cascade_payment_term_id:
-                date_reference = invoice._obtain_recent_picking_date(invoice, date_reference)
+            date_reference = invoice._obtain_recent_picking_date(invoice)
+            if not date_reference:
+                date_reference = invoice.invoice_date or invoice.date or fields.Date.context_today(invoice)
             is_draft = invoice.id != invoice._origin.id
             invoice.needed_terms = {}
             invoice.needed_terms_dirty = True
