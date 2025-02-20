@@ -157,7 +157,6 @@ class BaseThirdPartySaleImporter(TransientModel):
     def _read_excel(self):
         file = BytesIO(base64.b64decode(self.file))
         df = pd.read_excel(file , skiprows=self.header_skip, dtype={self.order_name_field: str, self.customer_vat_field: str})
-        _logger.info(df)
         df = self._preprocess_df(df)
         return df.to_dict(orient="records")
     
@@ -180,7 +179,6 @@ class BaseThirdPartySaleImporter(TransientModel):
     def import_file(self):
         recs = self._read_file()
         values_to_create = self._prepare_sale_order_create_values(list(filter_status_done_recs(recs, self.status_done, self.status_field)))
-        _logger.info('valores %s',values_to_create)
         orders = self.env['sale.order'].create(values_to_create)
         # orders.action_send_to_approval()
         return orders
@@ -205,7 +203,7 @@ class BaseThirdPartySaleImporter(TransientModel):
         address = self._prepare_address(row)
         customer_values = {
                 'name': row[self.customer_name_field], 
-                'vat': row[self.customer_vat_field] if isinstance(row[self.customer_vat_field], str) and row[self.customer_vat_field] and import_vat else False,
+                # 'vat': row[self.customer_vat_field] if isinstance(row[self.customer_vat_field], str) and row[self.customer_vat_field] and import_vat else False,
                 'street':address,
                 'city': row[self.city_field],
                 'state_id': state_id,
@@ -306,6 +304,7 @@ class BaseThirdPartySaleImporter(TransientModel):
         sale_order_values = {
             'partner_id': partner_id,
             'order_line': items,
+            'is_third_party_imported': True,
             "date_order": self._get_date_order(row),
             # 'payment_condition_id': self._get_payment_condition(row) ,
             # 'payment_acquirer_id': self._get_payment_method(row) or 1,
@@ -319,7 +318,6 @@ class BaseThirdPartySaleImporter(TransientModel):
                 'meli_delivery_type': row[self.delivery_type_field],
 
             })
-        _logger.info(sale_order_values)
         return sale_order_values
     
     def _get_analytic_account(self):
