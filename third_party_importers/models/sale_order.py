@@ -16,7 +16,6 @@ class SaleOrder(models.Model):
 
     def _create_credit_note(self):
         invoice = self.invoice_ids.filtered(lambda x: x.state == 'posted' and x.payment_state != 'reversed' and x.move_type == 'out_invoice')
-        _logger.info('invoice %s', invoice)
         if invoice:
             reversal_wizard = self.env['account.move.reversal'].with_context(active_ids=invoice.ids)
             wizard = reversal_wizard.create({
