@@ -8,9 +8,8 @@ _logger = logging.getLogger(__name__)
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
-    is_active_validate = fields.Boolean(string="Active Validate", compute="_compute_is_active_validate", store=True)
+    is_active_validate = fields.Boolean(string="Active Validate", compute="_compute_is_active_validate")
 
-    @api.depends('sale_id.is_active_validate', 'sale_id.payment_term_id', 'scheduled_date')
     def _compute_is_active_validate(self):
         for rec in self:
             if rec.picking_type_id.code == 'outgoing':
