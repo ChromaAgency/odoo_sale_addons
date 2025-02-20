@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="meli_sale_importer_action" model="ir.actions.act_window">
+        <field name="name">Importar Meli</field>
+        <field name="res_model">meli.sale.importer</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="tienda_nube_sale_importer_action" model="ir.actions.act_window">
+        <field name="name">Importar Tienda Nube</field>
+        <field name="res_model">tiendanube.sale.importer</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+    <record id="woocommerce_sale_importer_action" model="ir.actions.act_window">
+        <field name="name">Importar Woocommerce</field>
+        <field name="res_model">woocommerce.sale.importer</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

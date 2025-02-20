@@ -1,0 +1,4 @@
+id,name,model_id/id,group_id/id,perm_read,perm_write,perm_create,perm_unlink
+access_meli_importer,access_meli_importer,model_meli_sale_importer,base.group_user,1,1,1,0
+access_tienda_nube_importer,access_tienda_nube_importer,model_tiendanube_sale_importer,base.group_user,1,1,1,0
+access_woocommerce_importer,access_woocommerce_importer,model_woocommerce_sale_importer,base.group_user,1,1,1,0

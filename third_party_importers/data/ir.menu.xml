@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem
+        id="import_third_party_menu"
+        name="Importadores"
+        parent="sale.sale_menu_root"
+        sequence="10"/>
+
+    <menuitem
+        id="meli_third_party_importer_menu"
+        name="MercadoLibre"
+        parent="import_third_party_menu"
+        action="meli_sale_importer_action"
+        sequence="10"/>
+        <menuitem
+        id="tienda_nube_third_party_importer_menu"
+        name="Tienda Nube"
+        parent="import_third_party_menu"
+        action="tienda_nube_sale_importer_action"
+        sequence="10"/>
+        <menuitem
+        id="wordpress_third_party_importer_menu"
+        name="Woocommmerce"
+        parent="import_third_party_menu"
+        action="woocommerce_sale_importer_action"
+        sequence="10"/>
+
+
+
+</odoo>
