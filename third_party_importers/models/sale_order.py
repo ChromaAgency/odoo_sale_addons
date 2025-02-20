@@ -18,7 +18,6 @@ class SaleOrder(models.Model):
         invoice = self.invoice_ids.filtered(lambda x: x.state == 'posted' and x.payment_state != 'reversed' and x.move_type == 'out_invoice')
         if invoice:
             pays = invoice.matched_payment_ids
-            _logger.info('Pays: %s' % pays)
             pays.action_draft()
             pays.unlink()
             reversal_wizard = self.env['account.move.reversal'].with_context(active_ids=invoice.ids)
