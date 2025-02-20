@@ -14,6 +14,9 @@ def status_contains(status_to_check, status_list):
     return any(status_filter)
 
 def filter_status_done_recs(recs, status_done_list, status_field):
+    for rec in recs:
+        _logger.info(f"Filtering status done rec {rec} {status_contains(rec[status_field], status_done_list)}")
+    _logger.info(f"Filtering status done list {status_done_list}")
     return filter(lambda r: status_contains(r[status_field], status_done_list), recs)
 
 class BaseThirdPartySaleImporter(TransientModel):
@@ -179,7 +182,26 @@ class BaseThirdPartySaleImporter(TransientModel):
     def import_file(self):
         recs = self._read_file()
         values_to_create = self._prepare_sale_order_create_values(list(filter_status_done_recs(recs, self.status_done, self.status_field)))
+        existing_orders = self.env['sale.order'].search([('name', 'in', [order['name'] for order in values_to_create])])
+        if existing_orders:
+            values_to_create = list(filter(lambda order: order['name'] not in [existing_order.name for existing_order in existing_orders], values_to_create))
+            for exorder in existing_orders:
+                if exorder.state not in ['draft', 'sent']:
+                    continue
+                try:
+                    data = next(filter(lambda order: order['name'] == exorder.name, values_to_create))
+                    exorder.write(data)
+                except StopIteration:
+                    pass
+
+                
+        values_to_cancel = list(filter_status_done_recs(recs, self.status_cancel, self.status_field))
+        canceled_values_names = [ f'{self.name_prefix} {order[self.order_name_field]}'  for order in values_to_cancel ]
+        canceled_orders = self.env['sale.order'].search([('name', 'in', canceled_values_names)])
+        if canceled_orders:
+            canceled_orders.with_context(disable_cancel_warning=True).action_cancel()
         orders = self.env['sale.order'].create(values_to_create)
+
         # orders.action_send_to_approval()
         return orders
 

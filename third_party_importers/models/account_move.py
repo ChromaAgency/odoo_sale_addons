@@ -9,7 +9,7 @@ class AccountMove(models.Model):
     def action_post(self):
         res = super(AccountMove, self).action_post()
         for move in self:
-            if move.invoice_line_ids.sale_line_ids.order_id.is_third_party_imported:
+            if move.invoice_line_ids.sale_line_ids.order_id.is_third_party_imported and move.move_type == 'out_invoice':
                 journal_id =  self.env['ir.config_parameter'].sudo().get_param('third_party_importers.third_party_account_journal_id') or False
                 if not journal_id:
                     raise UserError(_('Please configure the journal for third party importers in settings'))
