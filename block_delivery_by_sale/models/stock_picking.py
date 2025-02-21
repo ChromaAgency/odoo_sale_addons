@@ -13,7 +13,9 @@ class StockPicking(models.Model):
     def _compute_is_active_validate(self):
         for rec in self:
             if rec.picking_type_id.code == 'outgoing':
-                if not rec.sale_id.payment_term_id.cascade_payment_term_id and rec.scheduled_date:
+                if rec.sale_id.is_active_validate:
+                    rec.is_active_validate = True
+                elif not rec.sale_id.payment_term_id.cascade_payment_term_id and rec.scheduled_date:
                     rec.is_active_validate = rec.scheduled_date.date() <= fields.Date.today()
                 elif rec.sale_id.payment_term_id.cascade_payment_term_id and rec.sale_id.is_active_validate:
                     rec.is_active_validate = True
