@@ -6,11 +6,16 @@ _logger = logging.getLogger(__name__)
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    is_active_validate = fields.Boolean(string="Active validate", compute="_compute_active_validate", store=True)
-
+    is_active_validate = fields.Boolean(string="Active validate", compute="_compute_active_validate")
+    is_active_validate_manual = fields.Boolean(string="Active validate")
+    
     @api.depends('payment_term_id','invoice_ids','invoice_ids.state', 'invoice_ids.payment_state')
     def _compute_active_validate(self):
         for rec in self:
+            if rec.is_active_validate_manual:
+                rec.is_active_validate = True
+                return
+                
             if rec.payment_term_id.cascade_payment_term_id:
                 if rec.invoice_ids and rec.payment_term_id.cascade_payment_term_id:
                     downpayment_invoices = rec.invoice_ids.filtered(
@@ -32,7 +37,7 @@ class SaleOrder(models.Model):
         return res
     
     def active_validate(self):
-        self.is_active_validate = True
+        self.is_active_validate_manual = True
 
     def block_validate(self):
-        self.is_active_validate = False
+        self.is_active_validate_manual = False
