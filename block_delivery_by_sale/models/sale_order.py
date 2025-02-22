@@ -12,6 +12,7 @@ class SaleOrder(models.Model):
     @api.depends('payment_term_id','invoice_ids','invoice_ids.state', 'invoice_ids.payment_state')
     def _compute_active_validate(self):
         for rec in self:
+            rec.is_active_validate = False
             if rec.is_active_validate_manual:
                 rec.is_active_validate = True
                 return
@@ -23,8 +24,6 @@ class SaleOrder(models.Model):
                     )
                     if downpayment_invoices:
                         rec.is_active_validate = any(state in ['paid','in_payment'] for state in downpayment_invoices.mapped('payment_state'))
-            else:
-                rec.is_active_validate = False
 
 
     def _prepare_invoice(self):
