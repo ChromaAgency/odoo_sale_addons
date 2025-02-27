@@ -43,7 +43,15 @@ class BaseThirdPartySaleImporter(TransientModel):
     @property
     def price_unit_field(self):
         raise NotImplementedError("You must implement property price_unit_field")
+
+    @property
+    def ref_field(self):
+        return False
     
+    @property
+    def username_field(self):
+        return False
+
     @property
     def date_order_field(self):
         raise NotImplementedError("You must implement property date_order_field")
@@ -324,11 +332,13 @@ class BaseThirdPartySaleImporter(TransientModel):
             discount_line = self._add_discount(row)
             items.append(Command.create(discount_line))
         sale_order_values = {
+            'ref': row[self.ref_field] if self.ref_field else False,
+            'username': row[self.username_field] if self.username_field else False,
             'partner_id': partner_id,
             'order_line': items,
             'is_third_party_imported': True,
             "date_order": self._get_date_order(row),
-            # 'payment_condition_id': self._get_payment_condition(row) ,
+            # 'payment_condition_id': self._get_payment_condition(row),
             # 'payment_acquirer_id': self._get_payment_method(row) or 1,
             "name": f'{self.name_prefix} {row[self.order_name_field]}',
             # "analytic_account_id": self._get_analytic_account(),

@@ -3,7 +3,16 @@ class WoocomerceSaleImporter(TransientModel):
     _name = 'woocommerce.sale.importer'
     _description = 'Woocomerce Sale Importer'
     _inherit = 'base.third.party.sale.importer'
+    
 
+    @property
+    def ref_field(self):
+        return "Cobro Aprobado"
+    
+    @property
+    def username_field(self):
+        return "Usuario ML"
+        
     @property
     def order_name_field(self):
         return "Número de pedido"
