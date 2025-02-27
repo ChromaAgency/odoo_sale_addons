@@ -39,7 +39,15 @@ class MeliSaleImporter(TransientModel):
     @property
     def header_skip(self):
         return 5
+
+    @property
+    def ref_field(self):
+        return "Cobro Aprobado"
     
+    @property
+    def username_field(self):
+        return "Usuario ML"
+        
     @property
     def order_name_field(self):
         return "# de venta"

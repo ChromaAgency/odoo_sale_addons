@@ -332,7 +332,7 @@ class BaseThirdPartySaleImporter(TransientModel):
             discount_line = self._add_discount(row)
             items.append(Command.create(discount_line))
         sale_order_values = {
-            'ref': row[self.ref_field] if self.ref_field else False,
+            'client_order_ref': row[self.ref_field] if self.ref_field else False,
             'username': row[self.username_field] if self.username_field else False,
             'partner_id': partner_id,
             'order_line': items,
