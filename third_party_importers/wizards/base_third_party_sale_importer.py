@@ -233,7 +233,7 @@ class BaseThirdPartySaleImporter(TransientModel):
         address = self._prepare_address(row)
         customer_values = {
                 'name': row[self.customer_name_field], 
-                # 'vat': row[self.customer_vat_field] if isinstance(row[self.customer_vat_field], str) and row[self.customer_vat_field] and import_vat else False,
+                'vat': row[self.customer_vat_field] if isinstance(row[self.customer_vat_field], str) and row[self.customer_vat_field] and import_vat else False,
                 'street':address,
                 'city': row[self.city_field],
                 'state_id': state_id,
