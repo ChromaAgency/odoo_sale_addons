@@ -47,7 +47,7 @@ class MeliSaleImporter(TransientModel):
     @property
     def username_field(self):
         return "Usuario ML"
-        
+
     @property
     def order_name_field(self):
         return "# de venta"
@@ -147,7 +147,7 @@ class MeliSaleImporter(TransientModel):
     
     @property
     def shipping_cost(self):
-        return False
+        return "Ingresos por envío (ARS)"
     
     @property
     def discount(self):

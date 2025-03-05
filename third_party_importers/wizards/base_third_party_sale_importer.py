@@ -278,7 +278,7 @@ class BaseThirdPartySaleImporter(TransientModel):
         return customer.id
 
     def _get_product_domain(self, row):
-        return [('default_code', '=', row[self.product_code_field])]
+        return [('default_code', 'ilike', row[self.product_code_field])]
     
     def search_product(self, row):
         product = self.env['product.product'].search(self._get_product_domain(row), limit=1)
