@@ -6,7 +6,8 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     is_third_party_imported = fields.Boolean(string='Is Third Party Imported', default=False)
-    username = fields.Char(string='Username')
+    tp_username = fields.Char(string='Username')
+
     def action_cancel(self):
         res = super(SaleOrder, self).action_cancel()
         for order in self:
