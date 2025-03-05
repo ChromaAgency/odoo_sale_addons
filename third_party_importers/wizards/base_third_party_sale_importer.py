@@ -325,7 +325,12 @@ class BaseThirdPartySaleImporter(TransientModel):
         partner_id = self.search_or_create_customer(row) if not partner else partner
         new_item =  self._prepare_sale_order_items(row)
         items.append(Command.create(new_item))
-        if self.shipping_cost and row[self.shipping_cost] > 0.0:
+        has_shipping_line = any(
+        isinstance(item, tuple) and isinstance(item[2], dict) and item[2].get("name") == "Envío"
+        for item in items
+    )
+
+        if self.shipping_cost and row[self.shipping_cost] > 0.0 and not has_shipping_line:
             shipping_line = self._add_shipping_cost(row)
             items.append(Command.create(shipping_line))
         if self.discount and row[self.discount] > 0.0:
