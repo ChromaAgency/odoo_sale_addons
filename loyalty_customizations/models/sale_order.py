@@ -35,9 +35,13 @@ class SaleOrderLine(models.Model):
                 line.quantity_to_add_points = (line.product_uom_qty - line.qty_delivered) * -1
                 continue
             line.quantity_to_add_points = 0
-        self.order_id._try_apply_program(self.coupon_id.program_id)
+            line.order_id._recompute_program_points(line)
+        
+            
 
-        #TODO forget everything, only maintan program_check_compute_points and use _get_applied_programs to get the program in the order and run _program_check_compute_points with that data, obtain the card and discount the amount.
+        #TODO forget everything, only maintan program_check_compute_points and use _get_applied_programs 
+        # to get the program in the order and run _program_check_compute_points with that data, obtain the card and discount the amount.
+
 
 
 
@@ -45,6 +49,17 @@ class SaleOrder(models.Model):
     _inherit = "sale.order"
 
     
+    def _recompute_program_points(self, line):
+        for order in self:
+            coupon = line.coupon_id
+            program = coupon.program_id
+            status = order._program_check_compute_points(program)
+            all_points = status['points']
+            points = all_points[0]
+            if points:
+                coupon.points += points
+
+
     def _program_check_compute_points(self, programs):
         """
         Checks the program validity from the order lines aswell as computing the number of points to add.
@@ -176,67 +191,3 @@ class SaleOrder(models.Model):
         domain = super(SaleOrder, self)._get_program_domain()
         domain.append(('partner_ids', 'in', self.partner_id.id))
         return domain
-    
-    def _try_apply_program(self, program, coupon=None):
-        _logger.info('running try apply')
-        """
-        Tries to apply a program using the coupon if provided.
-
-        This function provides the full routine to apply a program, it will check for applicability
-        aswell as creating the necessary coupons and co-models to give the points to the customer.
-
-        This function does not apply any reward to the order, rewards have to be given manually.
-
-        Returns a dict containing the error message or containing the associated coupon(s).
-        """
-        self.ensure_one()
-        # Basic checks
-        if not program.filtered_domain(self._get_program_domain()):
-            return {'error': _('The program is not available for this order.')}
-        elif program in self._get_applied_programs():
-            return {'error': _('This program is already applied to this order.')}
-        # Check for applicability from the program's triggers/rules.
-        # This step should also compute the amount of points to give for that program on that order.
-        status = self._program_check_compute_points(program)[program]
-        _logger.info('status %s',status)
-        if 'error' in status:
-            return status
-        return self.__try_apply_program(program, coupon, status)
-    
-    
-
-    def __try_apply_program(self, program, coupon, status):
-        self.ensure_one()
-        _logger.info('running try apply')
-        all_points = status['points']
-        points = all_points[0]
-        _logger.info('points %s',points)
-        coupons = coupon or self.env['loyalty.card']
-        if coupon:
-            if program.is_nominative:
-                self._add_points_for_coupon({coupon: points})
-        elif not coupon:
-            # If the program only applies on the current order it does not make sense to fetch already existing coupons
-            if program.is_nominative:
-                coupon = self.env['loyalty.card'].search(
-                    [('partner_id', '=', self.partner_id.id), ('program_id', '=', program.id)], limit=1)
-                # Do not apply 'nominative' programs if no point is given and no coupon exists
-                if not points and not coupon:
-                    return {'error': _('No card found for this loyalty program and no points will be given with this order.')}
-                elif coupon:
-                    self._add_points_for_coupon({coupon: points})
-                coupons = coupon
-            if not coupon:
-                all_points = [p for p in all_points if p]
-                partner = False
-                # Loyalty programs and ewallets are nominative
-                if program.is_nominative:
-                    partner = self.partner_id.id
-                coupons = self.env['loyalty.card'].sudo().with_context(loyalty_no_mail=True, tracking_disable=True).create([{
-                    'program_id': program.id,
-                    'partner_id': partner,
-                    'points': 0,
-                    'order_id': self.id,
-                } for _ in all_points])
-                self._add_points_for_coupon({coupon: x for coupon, x in zip(coupons, all_points)})
-        return {'coupon': coupons}
