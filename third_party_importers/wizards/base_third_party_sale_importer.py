@@ -348,13 +348,13 @@ class BaseThirdPartySaleImporter(TransientModel):
             "name": f'{self.name_prefix} {row[self.order_name_field]}',
             # "analytic_account_id": self._get_analytic_account(),
         }
-        # if self.delivery_type_field and 'full' in str(row[self.delivery_type_field]).lower():
-        #     full_warehouse = self.env['ir.config_parameter'].sudo().get_param('stock.warehouse.full.meli')
-        #     sale_order_values.update({
-        #         'warehouse_id': full_warehouse,
-        #         'meli_delivery_type': row[self.delivery_type_field],
+        if self.delivery_type_field and 'full' in str(row[self.delivery_type_field]).lower():
+            full_warehouse = self.env['ir.config_parameter'].sudo().get_param('stock.warehouse.full.meli')
+            sale_order_values.update({
+                'warehouse_id': full_warehouse,
+                'meli_delivery_type': row[self.delivery_type_field],
 
-        #     })
+            })
         return sale_order_values
     
     def _get_analytic_account(self):

@@ -18,7 +18,7 @@
     'version': '1.0',
     'installable': True,
     # any module necessary for this one to work correctly
-    'depends': ['sale', 'l10n_ar', 'account_payment_conditions'],
+    'depends': ['sale', 'l10n_ar', 'account_payment_conditions','sale_stock'],
     # always loaded
     'data': [
         'security/ir.model.access.csv',
