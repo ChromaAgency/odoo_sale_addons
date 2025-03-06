@@ -24,18 +24,23 @@ class SaleOrderLine(models.Model):
 
     @api.depends('product_id', 'product_uom_qty', 'qty_delivered')
     def _compute_quantity_to_add_points(self):
+        _logger.info('this is a sale line? %s',self)
         for line in self:
             if not line.qty_delivered:
                 line.quantity_to_add_points = line.product_uom_qty
+                _logger.info('quantity to add points %s',line.quantity_to_add_points)
                 continue
             if line.product_uom_qty == line.qty_delivered:
                 line.quantity_to_add_points = 0
+                _logger.info('quantity to add points %s',line.quantity_to_add_points)
                 continue
             if line.product_uom_qty > line.qty_delivered:
                 line.quantity_to_add_points = (line.product_uom_qty - line.qty_delivered) * -1
+                _logger.info('quantity to add points %s',line.quantity_to_add_points)
                 continue
             line.quantity_to_add_points = 0
-            line.order_id._recompute_program_points(line)
+        if self.order_id.state in ['sale', 'done']:
+            self.order_id._recompute_program_points()
         
             
 
@@ -49,15 +54,22 @@ class SaleOrder(models.Model):
     _inherit = "sale.order"
 
     
-    def _recompute_program_points(self, line):
+    def _recompute_program_points(self):
         for order in self:
-            coupon = line.coupon_id
-            program = coupon.program_id
-            status = order._program_check_compute_points(program)
-            all_points = status['points']
-            points = all_points[0]
-            if points:
-                coupon.points += points
+            programs = order._get_applied_programs()
+            for program in programs:
+                _logger.info(program)
+                status = order._program_check_compute_points(program)
+                all_points = status[program].get('points', False)
+                _logger.info('all points %s',all_points)
+                if all_points:
+                    points = all_points[0]
+                    _logger.info('points %s',points)
+                    card = program.coupon_ids.filtered(lambda c: c.partner_id == order.partner_id)
+                    card.points += points
+                    _logger.info('card %s',card.points)
+            for line in order.order_line:
+                line.quantity_to_add_points = 0
 
 
     def _program_check_compute_points(self, programs):
