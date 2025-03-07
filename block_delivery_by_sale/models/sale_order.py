@@ -7,13 +7,17 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     is_active_validate = fields.Boolean(string="Active validate", compute="_compute_active_validate")
-    is_active_validate_manual = fields.Boolean(string="Active validate")
+    is_active_validate_manual = fields.Boolean(string="Active validate", default=False)
     
-    @api.depends('payment_term_id','invoice_ids','invoice_ids.state', 'invoice_ids.payment_state')
+    @api.depends('payment_term_id','invoice_ids','invoice_ids.state', 'invoice_ids.payment_state','order_line.product_id')
     def _compute_active_validate(self):
         for rec in self:
             rec.is_active_validate = False
             if rec.is_active_validate_manual:
+                rec.is_active_validate = True
+                return
+            has_pickup = any(line.product_id.is_pickup for line in rec.order_line)
+            if has_pickup:
                 rec.is_active_validate = True
                 return
                 
