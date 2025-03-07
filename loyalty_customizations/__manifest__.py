@@ -17,7 +17,7 @@
     'category': 'Sales',
     'version': '0.1',
 
-    'depends': ['sale_management','sale','loyalty','sale_loyalty'],
+    'depends': ['sale_management','sale','loyalty','sale_loyalty','sale_stock'],
 
     'data': [ 
         'views/loyalty.program.xml',
