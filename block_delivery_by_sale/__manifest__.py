@@ -11,6 +11,7 @@
         'views/sale.order.xml',
         'views/stock.picking.xml',
         'views/account.payment.term.xml',
+        'views/product.template.xml',
     ],
     'installable': True,
     'license': 'GPL-3',
