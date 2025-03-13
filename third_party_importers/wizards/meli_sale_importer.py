@@ -21,6 +21,17 @@ class MeliSaleImporter(TransientModel):
         if row.name in indexes:
             cart_row = search_cart_row_in_df(df, row.name, indexes)
             row[self.order_name_field] = cart_row[self.order_name_field]
+            row[self.customer_name_field] = cart_row[self.customer_name_field]
+            row[self.customer_vat_field] = cart_row[self.customer_vat_field]
+            row[self.address_field] = cart_row[self.address_field]
+            row[self.city_field] = cart_row[self.city_field]
+            row[self.state_field] = cart_row[self.state_field]
+            row[self.zip_field] = cart_row[self.zip_field]
+            row[self.delivery_type_field] = cart_row[self.delivery_type_field]
+            row[self.afip_responsability_type_field] = cart_row[self.afip_responsability_type_field]
+            row[self.shipping_cost] = cart_row[self.shipping_cost]
+            row[self.username_field] = cart_row[self.username_field]
+            row[self.date_order_field] = cart_row[self.date_order_field]
         return row
 
     def _add_fields_to_cart_items_and_erase_cart_line(self, df:pd.DataFrame):
