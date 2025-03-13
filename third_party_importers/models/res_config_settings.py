@@ -10,3 +10,5 @@ class ResConfigSettings(models.TransientModel):
         domain="[('type', 'in', ['bank', 'cash', 'credit'])]",
         config_parameter='third_party_importers.third_party_account_journal_id',
     )
+
+    full_warehouse = fields.Many2one('stock.warehouse', string='Almacen de Full de Meli', config_parameter='stock.warehouse.full.meli')

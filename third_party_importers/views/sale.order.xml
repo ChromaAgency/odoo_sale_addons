@@ -9,6 +9,9 @@
             <field name="client_order_ref" position="after">
                 <field name="tp_username" readonly="1"/>
             </field>
+            <xpath expr="//field[@name='picking_policy']" position="after">
+                <field name="meli_delivery_type" invisible="meli_delivery_type == False"/>
+            </xpath>
         </field>
     </record>
 

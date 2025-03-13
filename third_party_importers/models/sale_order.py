@@ -7,6 +7,7 @@ class SaleOrder(models.Model):
 
     is_third_party_imported = fields.Boolean(string='Is Third Party Imported', default=False)
     tp_username = fields.Char(string='Username')
+    meli_delivery_type = fields.Char(string='Tipo de entrega', readonly=True)
 
     def action_cancel(self):
         res = super(SaleOrder, self).action_cancel()
