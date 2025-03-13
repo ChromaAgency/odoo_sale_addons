@@ -78,11 +78,11 @@ class MeliSaleImporter(TransientModel):
 
     @property
     def status_done(self):
-        return ["Procesando en la bodega", "Entregado", "En camino", "Etiqueta lista para imprimir", "Despacharemos el paquete", "Etiqueta impresa"]
+        return ["Procesando en la bodega", "Entregado", "En camino", "Etiqueta lista para imprimir", "Despacharemos el paquete", "Etiqueta impresa", "En punto de retiro"]
     
     @property
     def status_cancel(self):
-        return ["Devolución finalizada. Te dimos el dinero.", "Reclamo cerrado con reembolso al comprador", "Cancelada por el comprador"]
+        return ["Devolución finalizada. Te dimos el dinero.", "Reclamo cerrado con reembolso al comprador", "Cancelada por el comprador", "Venta cancelada. No despachés."]
     
     @property
     def status_field(self):
