@@ -209,7 +209,6 @@ class BaseThirdPartySaleImporter(TransientModel):
         if canceled_orders:
             canceled_orders.with_context(disable_cancel_warning=True).action_cancel()
         orders = self.env['sale.order'].create(values_to_create)
-
         # orders.action_send_to_approval()
         return orders
 
@@ -301,6 +300,11 @@ class BaseThirdPartySaleImporter(TransientModel):
             "price_unit": self._get_product_price_unit(row),
             "name": self._get_product_name(product),
         }
+        if self.delivery_type_field and 'full' in str(row[self.delivery_type_field]).lower():
+            full_warehouse = self.env['ir.config_parameter'].sudo().get_param('stock.warehouse.full.meli')
+            sale_order_items.update({
+                'warehouse_id': full_warehouse,
+            })
         return sale_order_items
     
     def _get_date_order(self, row):
