@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_order_form_inherit_base_third_party_importer" model="ir.ui.view">
+        <field name="name">sale.order.view.form.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <field name="client_order_ref" position="after">
+                <field name="tp_username" readonly="1"/>
+            </field>
+            <xpath expr="//field[@name='picking_policy']" position="after">
+                <field name="meli_delivery_type" invisible="meli_delivery_type == False"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

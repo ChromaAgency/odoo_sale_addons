@@ -6,21 +6,16 @@
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="arch" type="xml">
-            <!-- <field name="website" position="after"> -->
             <xpath expr="//page[@name='sales_purchases']//field[@name='user_id']" position="after">
             <field name="customer_point_type_id" />
                 <field name="customer_score" />
                 <field name="customer_point_ids">
-                    <tree editable="bottom">
+                    <list editable="bottom">
                         <field name="category_name"/>
                         <field name="score" />
-                    </tree>
-                </field>
-                
+                    </list>
+                </field>                
             </xpath>
-            
-
-
         </field>
 </record>
 <record id="view_partner_property_form_inherit_customer_categorization" model="ir.ui.view">

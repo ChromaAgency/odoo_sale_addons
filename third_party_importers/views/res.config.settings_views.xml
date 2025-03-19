@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_res_config_settings_form_inherit_third_party" model="ir.ui.view">
+        <field name="name">res.config.settings.form.inherit.third.party</field>
+        <field name="model">res.config.settings</field>
+        <!-- Adjust the inherit_id to match the view you want to extend -->
+        <field name="inherit_id" ref="sale.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <!-- Locate the sale settings block and insert the field -->
+            <block id="connectors_setting_container" position="inside">
+                <div class="row mt16 o_settings_container">
+                    <field name="third_party_account_journal_id" string="Diario de pago"/>
+                </div>
+            </block>
+        </field>
+    </record>
+
+    <record id="res_config_settings_view_form_inherit_growtech" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.growtech</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="stock.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//block[@name='warehouse_setting_container']" position="inside">
+                <setting id="meli_warehouse">
+                    <div class="content-group">
+                        <div class="mt16">
+                            <div class="o_setting_right_pane">
+                                <label for="full_warehouse" class="o_light_label" key="full_warehouse"/>
+                            </div>
+                                <div class="o_setting_right_pane">
+                                <field name="full_warehouse" />
+                            </div>
+                        </div>
+                    </div>
+                </setting>
+            </xpath>
+        </field>
+    </record>
+</odoo>

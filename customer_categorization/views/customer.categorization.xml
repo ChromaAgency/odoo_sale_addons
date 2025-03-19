@@ -2,9 +2,9 @@
 <odoo>
 
     <record id="customer_point_categorization_type_action" model="ir.actions.act_window">
-        <field name="name">Action Name</field>
+        <field name="name">Categorización de Cliente</field>
         <field name="res_model">customer.point.categorization.type</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 <record id="customer_point_categorization_type_view_form" model="ir.ui.view">
     <field name="name">customer.point.categorization.type.view.form</field>
@@ -20,14 +20,14 @@
         </form>
     </field>
 </record>
-<record id="customer_point_categorization_type_view_tree" model="ir.ui.view">
-    <field name="name">customer.point.categorization.type.view.tree</field>
+<record id="customer_point_categorization_type_view_list" model="ir.ui.view">
+    <field name="name">customer.point.categorization.type.view.list</field>
     <field name="model">customer.point.categorization.type</field>
     <field name="arch" type="xml">
-        <tree string="">
+        <list string="">
             <field name="category_name" />
             <field name="min_points" />
-        </tree>
+        </list>
     </field>
 </record>
 <menuitem

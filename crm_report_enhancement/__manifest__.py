@@ -12,10 +12,10 @@
     'author': "Chroma",
     'installable': True,
     'application':True,
-    'website': "http://www.making.com.ar",
+    'website': "https://chroma.agency",
 
     'category': 'Sales',
-    'version': '17.0.1.1',
+    'version': '18.0.1.1',
 
     # any module necessary for this one to work correctly
     'depends': ['crm','sale_crm'],

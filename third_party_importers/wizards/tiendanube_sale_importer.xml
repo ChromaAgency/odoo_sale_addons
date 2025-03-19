@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="tiendanube_sale_importer_view_form" model="ir.ui.view">
+        <field name="name">tiendanube.sale.importer.view.form</field>
+        <field name="model">tiendanube.sale.importer</field>
+        <field name="mode">primary</field>
+        <field name="inherit_id" ref="third_party_importers.base_third_party_sale_importer_view_form"/>
+        <field name="arch" type="xml">
+
+            <form />
+        </field>
+    </record>
+</odoo>

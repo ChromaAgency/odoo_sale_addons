@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="base_third_party_sale_importer_view_form" model="ir.ui.view">
+        <field name="name">base.third.party.sale.importer.view.form</field>
+        <field name="model">base.third.party.sale.importer</field>
+        <field name="arch" type="xml">
+            <form string="">
+                <sheet>
+                    <group>
+                       <field name="file" filename="filename"/> 
+                       <field name="filename" /> 
+                       <field name="separator" /> 
+                       <field name="encoding" /> 
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="import_file" string="Importar" type="object" class="oe_highlight"/>
+                    <button string="Cancelar" class="oe_link" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>
