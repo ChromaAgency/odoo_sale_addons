@@ -81,6 +81,8 @@ class SaleOrder(models.Model):
         self.ensure_one()
         programs = self._get_applied_programs()
         for program in programs:
+            if not self.partner_id.filtered_domain(program.partner_domain):
+                continue
             status = self._program_check_compute_points(program)[program]
             all_points = status.get('points', False)
             if all_points:
@@ -219,5 +221,5 @@ class SaleOrder(models.Model):
     
     def _get_program_domain(self):
         domain = super(SaleOrder, self)._get_program_domain()
-        domain.append(('partner_ids', 'in', self.partner_id.id))
+        domain.append('|', ('partner_ids', 'in', self.partner_id.id), ('partner_ids', '=', False))
         return domain

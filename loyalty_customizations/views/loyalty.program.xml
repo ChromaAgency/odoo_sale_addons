@@ -6,6 +6,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='date_to']" position="after">
                 <field name="partner_ids" widget="many2many_tags" placeholder="Seleccione clientes..."/>
+                <field name="partner_domain" widget="domain" options="{'model': 'res.partner', 'in_dialog': true}"/>
             </xpath>
         </field>
     </record>
