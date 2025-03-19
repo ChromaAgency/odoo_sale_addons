@@ -6,11 +6,12 @@
     'author': 'Chroma',
     'website': 'https://www.chroma.agency',
     "category": "Stock",
-    "depends": ['base', 'sale', 'stock','sale_stock'],
+    "depends": ['base', 'sale', 'stock','sale_stock','delivery','sale_management'],
     'data': [
         'views/sale.order.xml',
         'views/stock.picking.xml',
         'views/account.payment.term.xml',
+        'views/product.template.xml',
     ],
     'installable': True,
     'license': 'GPL-3',
