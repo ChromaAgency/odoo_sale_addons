@@ -1,36 +1,12 @@
-from odoo import models, fields, api
-import logging
 from collections import defaultdict
-from odoo.tools.float_utils import float_round
 from odoo.tools.translate import _
-_logger = logging.getLogger(__name__)
-
-from collections import defaultdict
-
-import itertools
-
-import random
-
 from odoo import api, fields, models, _
-from odoo.exceptions import UserError, ValidationError
-from odoo.fields import Command
-from odoo.tools.float_utils import float_is_zero, float_round
-from odoo.osv import expression
-
-from odoo import models, fields, api
+from odoo.tools.float_utils import float_is_zero, float_round, float_round
+from odoo.tools.safe_eval import safe_eval
 import logging
-
 _logger = logging.getLogger(__name__)
 
-from odoo import models, fields, api
-import logging
 
-_logger = logging.getLogger(__name__)
-
-from odoo import models, fields, api
-import logging
-
-_logger = logging.getLogger(__name__)
 
 class SaleOrderLine(models.Model):
     _inherit = "sale.order.line"
@@ -75,13 +51,11 @@ class SaleOrderLine(models.Model):
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
-
-    
     def _recompute_program_points(self, line):
         self.ensure_one()
         programs = self._get_applied_programs()
         for program in programs:
-            if not self.partner_id.filtered_domain(program.partner_domain):
+            if not self.partner_id.filtered_domain(safe_eval(program.partner_domain)):
                 continue
             status = self._program_check_compute_points(program)[program]
             all_points = status.get('points', False)
@@ -221,5 +195,7 @@ class SaleOrder(models.Model):
     
     def _get_program_domain(self):
         domain = super(SaleOrder, self)._get_program_domain()
-        domain.append('|', ('partner_ids', 'in', self.partner_id.id), ('partner_ids', '=', False))
+        domain.append('|')
+        domain.append(('partner_ids', 'in', self.partner_id.id))
+        domain.append(('partner_ids', '=', False))
         return domain
