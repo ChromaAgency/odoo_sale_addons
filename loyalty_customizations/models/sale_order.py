@@ -7,86 +7,110 @@ import logging
 _logger = logging.getLogger(__name__)
 
 
+class SaleOrderLine(models.Model):
+    _inherit = "sale.order.line"
+
+    @api.depends('move_ids.state', 'move_ids.scrapped', 'move_ids.quantity_done', 'move_ids.product_uom')
+    def _compute_qty_delivered(self):
+        _ = super()._compute_qty_delivered()
+        self.order_id._recalculate_points_by_qty_delivered()
+        return _
 
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
     points_by_uom_qty = fields.Float(
         string="Points by UoM Qty",
-        compute="_compute_points_by_uom_qty",
-        store=True,
         copy=False
     )
 
     points_by_qty_delivered = fields.Float(
         string="Points by Qty Delivered",
-        compute="_compute_points_by_qty_delivered",
-        store=True,
         copy=False
     )
     is_delivery_compute = fields.Boolean(copy=False)
 
-    previous_points_buffer = fields.Float(string="Previous Points Buffer", copy=False)
+    previous_points_by_qty_delivered = fields.Float(string="Previous Points Buffer", copy=False)
         
 
-    @api.depends('state')
-    def _compute_points_by_uom_qty(self):
-        for order in self:
-            points = order._compute_program_points()
+    def write(self, vals):
+        _ = super().write(vals)
+        _logger.info("write %s", vals)
+        if 'state' in vals and vals['state'] in ['sale', 'done']:
+            points = self._compute_program_points()
             _logger.info("Points in compute by UoM Qty: %s", points)   
-            _logger.info("Order name: %s", order.name)
-            _logger.info("Order lines: %s", order.order_line.ids)
-            order.points_by_uom_qty = points
-            if not order.points_by_qty_delivered:
-                order._recalculate_card_points() 
-
-    def _recalculate_card_points(self):
-        programs = self._get_applied_programs()
-        for program in programs:
-            if not self.partner_id.filtered_domain(safe_eval(program.partner_domain)):
-                continue
-            card = program.coupon_ids.filtered(lambda c: c.partner_id == self.partner_id)
-            if not self.points_by_qty_delivered:
-                card.points += self.points_by_uom_qty
-                continue
-            _logger.info("Points by UoM Qty: %s", self.points_by_uom_qty)
-            _logger.info("Points by Qty Delivered: %s", self.points_by_qty_delivered)
-            _logger.info("Previous Points Buffer: %s", self.previous_points_buffer)
-            if self.points_by_qty_delivered: # 10
-                if not self.previous_points_buffer: # 0
-                    card.points += self.points_by_qty_delivered - self.points_by_uom_qty # 10 y 20
-                    self.previous_points_buffer = self.points_by_qty_delivered #10
-                    _logger.info('first if')
-                else:
-                    if self.previous_points_buffer > self.points_by_qty_delivered: #10 y 20
-                        card.points -= self.previous_points_buffer # - 10
-                        card.points +=  self.points_by_qty_delivered # + 20
-                        self.previous_points_buffer = self.points_by_qty_delivered # 20
-                        _logger.info('second if')
-
-                    elif self.previous_points_buffer < self.points_by_qty_delivered: # 20 y 15
-                        card.points -= self.previous_points_buffer # -20
-                        card.points += self.points_by_qty_delivered # + 15
-                        self.previous_points_buffer = self.points_by_qty_delivered # 15   
-                        _logger.info('third if')
-                    else:
-                        card.points = card.points
-                        _logger.info('fourth if')
-            _logger.info("Card points: %s", card.points)
-
-    @api.depends('order_line.qty_delivered', 'state')
-    def _compute_points_by_qty_delivered(self):
+            _logger.info("Order name: %s", self.name)
+            _logger.info("Order lines: %s", self.order_line.ids)
+            self.points_by_uom_qty = points
+        return _
+        
+    def _recalculate_points_by_qty_delivered(self):
         for order in self:
             _logger.info("Qty delivered Order name: %s", order.name)
             _logger.info("Qty delivered Order lines: %s", order.order_line.ids)
             qty_delivered = sum(order.order_line.mapped('qty_delivered'))
-            if qty_delivered > 0:
+            if qty_delivered > 0 and not order.is_delivery_compute:
                 order.is_delivery_compute = True
                 points = order._compute_program_points()
                 _logger.info("Points in compute by Qty Delivered: %s", points)   
                 order.points_by_qty_delivered = points
                 order._recalculate_card_points()  
+            if qty_delivered == 0 and order.is_delivery_compute:
+                points = order._compute_program_points()
+                _logger.info("Points in compute by Qty Delivered: %s", points)   
+                order.points_by_qty_delivered = points
+                order._recalculate_card_points()
 
+    def _is_partner_in_program(self, program):
+        return self.partner_id.filtered_domain(safe_eval(program.partner_domain))
+
+    def _get_program_card(self, program):
+        return program.coupon_ids.filtered(lambda c: c.partner_id == self.partner_id)
+
+
+    
+    def _apply_points_on_first_computed_delivery(self, card):
+        if not self.previous_points_by_qty_delivered: 
+            card.points += self.points_by_qty_delivered - self.points_by_uom_qty 
+            self.previous_points_by_qty_delivered = self.points_by_qty_delivered 
+            _logger.info('sin previous_qty_delivered if points %s resta %s  nuevo previous %s' , card.points, self.points_by_qty_delivered - self.points_by_uom_qty, self.points_by_qty_delivered)
+            return True
+        return False
+
+    def _apply_points_on_subsequent_computed_deliveries(self, card):
+        if self.previous_points_by_qty_delivered != self.points_by_qty_delivered: 
+            card.points +=  self.points_by_qty_delivered  - self.previous_points_by_qty_delivered 
+            self.previous_points_by_qty_delivered = self.points_by_qty_delivered 
+            _logger.info('qty_delivered distinto de nuevo if points %s resta %s  nuevo previous %s' , card.points, self.points_by_qty_delivered - self.points_by_uom_qty, self.points_by_qty_delivered)
+        else:
+            card.points = card.points
+            _logger.info('qty_delivered igual if points %s resta %s  nuevo previous %s' , card.points, self.points_by_qty_delivered - self.points_by_uom_qty, self.points_by_qty_delivered)
+
+    def _apply_points_from_qty_delivered(self, card):
+        _logger.info("Points by UoM Qty: %s", self.points_by_uom_qty)
+        _logger.info("Points by Qty Delivered: %s", self.points_by_qty_delivered)
+        _logger.info("Previous Points Buffer: %s", self.previous_points_by_qty_delivered)
+
+        if not self.points_by_qty_delivered: # 10
+            return False
+        if self._apply_points_on_first_computed_delivery(card):
+            return True
+        self._apply_points_on_subsequent_computed_deliveries(card)
+        return True
+    
+    def _apply_points_to_program(self, program):
+        if not self._is_partner_in_program(program):
+            return 0
+        card = self._get_program_card(program)
+
+        self._apply_points_from_qty_delivered(card)
+        _logger.info("Card points: %s", card.points)
+        return card.points
+
+    def _recalculate_card_points(self):
+        programs = self._get_applied_programs()
+        for program in programs:
+            self._apply_points_to_program(program)
 
     def _compute_program_points(self):
         self.ensure_one()
