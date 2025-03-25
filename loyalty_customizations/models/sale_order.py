@@ -1,73 +1,99 @@
 from collections import defaultdict
 from odoo.tools.translate import _
 from odoo import api, fields, models, _
-from odoo.tools.float_utils import float_is_zero, float_round, float_round
+from odoo.tools.float_utils import float_round
 from odoo.tools.safe_eval import safe_eval
 import logging
 _logger = logging.getLogger(__name__)
 
 
-
 class SaleOrderLine(models.Model):
-    _inherit = "sale.order.line"
+    _inherit = "stock.picking"
 
-    quantity_to_add_points = fields.Float(
-        string="Cantidad para añadir a puntos",
-        compute="_compute_qty_delivered",
-        store=True
-    )
-    total_quantity_computed_points = fields.Float(
-        string="Total quantity Added points",
-        store=True,        
-        compute="_compute_qty_delivered",
-    )
-    previous_qty_delivered = fields.Float(
-        string="Cantidad Entregada Anteriormente",
-        store=True,        
-        compute="_compute_qty_delivered",
-
-    )
-
-    @api.depends('move_ids.state', 'move_ids.scrapped', 'move_ids.quantity_done', 'move_ids.product_uom')
-    def _compute_qty_delivered(self):
-        for line in self:
-            line.previous_qty_delivered = line.qty_delivered 
-        _ =  super(SaleOrderLine, self)._compute_qty_delivered()          
-        for line in self:      
-            line.quantity_to_add_points = 0
-            if not line.order_id.is_confirm:
-                line.quantity_to_add_points = line.product_uom_qty
-                line.total_quantity_computed_points += line.product_uom_qty
-                line.order_id._recompute_program_points(line)
-                continue
-            
-            if line.total_quantity_computed_points != line.qty_delivered:
-                quantity_to_add_points = line.qty_delivered - (line.previous_qty_delivered or line.product_uom_qty)
-                line.quantity_to_add_points = quantity_to_add_points
-                line.total_quantity_computed_points += quantity_to_add_points
-                line.order_id._recompute_program_points(line)
-                continue
-  
-        for line in self:
-            if line.order_id.state in {'sale',  'done'}:
-                line.order_id.is_confirm = True
-            
+    
+    def button_validate(self):
+        _ = super().button_validate()
+        self.sale_id._recalculate_points_by_qty_delivered()
         return _
-
-
 
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
-    is_confirm = fields.Boolean(default=False, copy=False)
-    
+    points_by_uom_qty = fields.Float(
+        string="Points by UoM Qty",
+        copy=False
+    )
 
-    def action_cancel(self):
-        _ = super().action_cancel()
-        self.is_confirm = False
+    points_by_qty_delivered = fields.Float(
+        string="Points by Qty Delivered",
+        copy=False
+    )
+    is_delivery_compute = fields.Boolean(copy=False)
+
+    previous_points_by_qty_delivered = fields.Float(string="Previous Points Buffer", copy=False)
+        
+
+    def write(self, vals):
+        _ = super().write(vals)
+        if 'state' in vals and vals['state'] in ['sale', 'done']:
+            points = self._compute_program_points()
+            self.points_by_uom_qty = points
         return _
         
-    def _recompute_program_points(self, line):
+    def _recalculate_points_by_qty_delivered(self):
+        for order in self:
+            order.order_line.invalidate_recordset(['qty_delivered'])
+            qty_delivered = sum(order.order_line.mapped('qty_delivered'))
+            if qty_delivered > 0 and not order.is_delivery_compute:
+                order.is_delivery_compute = True
+            if order.is_delivery_compute:
+                points = order._compute_program_points()
+                order.points_by_qty_delivered = points
+                order._recalculate_card_points()
+
+    def _is_partner_in_program(self, program):
+        return self.partner_id.filtered_domain(safe_eval(program.partner_domain))
+
+    def _get_program_card(self, program):
+        return program.coupon_ids.filtered(lambda c: c.partner_id == self.partner_id)
+    
+    def _apply_points_on_first_computed_delivery(self, card):
+        if not self.previous_points_by_qty_delivered: 
+            card.points += self.points_by_qty_delivered - self.points_by_uom_qty 
+            self.previous_points_by_qty_delivered = self.points_by_qty_delivered 
+            return True
+        return False
+
+    def _apply_points_on_subsequent_computed_deliveries(self, card):
+        if self.previous_points_by_qty_delivered != self.points_by_qty_delivered: 
+            card.points +=  self.points_by_qty_delivered  - self.previous_points_by_qty_delivered 
+            self.previous_points_by_qty_delivered = self.points_by_qty_delivered 
+        else:
+            card.points = card.points
+
+    def _apply_points_from_qty_delivered(self, card):
+
+        if not self.points_by_qty_delivered and not self.previous_points_by_qty_delivered: 
+            return False
+        if self._apply_points_on_first_computed_delivery(card):
+            return True
+        self._apply_points_on_subsequent_computed_deliveries(card)
+        return True
+    
+    def _apply_points_to_program(self, program):
+        if not self._is_partner_in_program(program):
+            return 0
+        card = self._get_program_card(program)
+
+        self._apply_points_from_qty_delivered(card)
+        return card.points
+
+    def _recalculate_card_points(self):
+        programs = self._get_applied_programs()
+        for program in programs:
+            self._apply_points_to_program(program)
+
+    def _compute_program_points(self):
         self.ensure_one()
         programs = self._get_applied_programs()
         for program in programs:
@@ -77,9 +103,8 @@ class SaleOrder(models.Model):
             all_points = status.get('points', False)
             if all_points:
                 points = all_points[0]
-                card = program.coupon_ids.filtered(lambda c: c.partner_id == self.partner_id)
-                card.points += points
-        line.quantity_to_add_points = 0
+                return points
+        return 0
 
 
     def _program_check_compute_points(self, programs):
@@ -94,8 +119,12 @@ class SaleOrder(models.Model):
         order_lines = self._get_not_rewarded_order_lines()
         products = order_lines.product_id
         products_qties = dict.fromkeys(products, 0)
+        delivered_qtys = self.is_delivery_compute
         for line in order_lines:
-            products_qties[line.product_id] += line.quantity_to_add_points
+            if delivered_qtys:
+                products_qties[line.product_id] += line.qty_delivered
+            else:
+                products_qties[line.product_id] += line.product_uom_qty
         # Contains the products that can be applied per rule
         products_per_rule = programs._get_valid_products(products)
 
@@ -204,9 +233,7 @@ class SaleOrder(models.Model):
                 program_result['error'] = _("This program is not available for public users.")
             if 'error' not in program_result:
                 points_result = [points] + rule_points
-                _logger.info('points result %s',points_result)
                 program_result['points'] = points_result
-        _logger.info(result)
         return result
     
     def _get_program_domain(self):
