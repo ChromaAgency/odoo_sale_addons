@@ -8,12 +8,12 @@ _logger = logging.getLogger(__name__)
 
 
 class SaleOrderLine(models.Model):
-    _inherit = "sale.order.line"
+    _inherit = "stock.picking"
 
-    @api.depends('move_ids.state', 'move_ids.scrapped', 'move_ids.quantity_done', 'move_ids.product_uom')
-    def _compute_qty_delivered(self):
-        _ = super()._compute_qty_delivered()
-        self.order_id._recalculate_points_by_qty_delivered()
+    
+    def button_validate(self):
+        _ = super().button_validate()
+        self.sale_id._recalculate_points_by_qty_delivered()
         return _
 
 class SaleOrder(models.Model):
@@ -35,29 +35,19 @@ class SaleOrder(models.Model):
 
     def write(self, vals):
         _ = super().write(vals)
-        _logger.info("write %s", vals)
         if 'state' in vals and vals['state'] in ['sale', 'done']:
             points = self._compute_program_points()
-            _logger.info("Points in compute by UoM Qty: %s", points)   
-            _logger.info("Order name: %s", self.name)
-            _logger.info("Order lines: %s", self.order_line.ids)
             self.points_by_uom_qty = points
         return _
         
     def _recalculate_points_by_qty_delivered(self):
         for order in self:
-            _logger.info("Qty delivered Order name: %s", order.name)
-            _logger.info("Qty delivered Order lines: %s", order.order_line.ids)
+            order.order_line.invalidate_recordset(['qty_delivered'])
             qty_delivered = sum(order.order_line.mapped('qty_delivered'))
             if qty_delivered > 0 and not order.is_delivery_compute:
                 order.is_delivery_compute = True
+            if order.is_delivery_compute:
                 points = order._compute_program_points()
-                _logger.info("Points in compute by Qty Delivered: %s", points)   
-                order.points_by_qty_delivered = points
-                order._recalculate_card_points()  
-            if qty_delivered == 0 and order.is_delivery_compute:
-                points = order._compute_program_points()
-                _logger.info("Points in compute by Qty Delivered: %s", points)   
                 order.points_by_qty_delivered = points
                 order._recalculate_card_points()
 
@@ -66,14 +56,11 @@ class SaleOrder(models.Model):
 
     def _get_program_card(self, program):
         return program.coupon_ids.filtered(lambda c: c.partner_id == self.partner_id)
-
-
     
     def _apply_points_on_first_computed_delivery(self, card):
         if not self.previous_points_by_qty_delivered: 
             card.points += self.points_by_qty_delivered - self.points_by_uom_qty 
             self.previous_points_by_qty_delivered = self.points_by_qty_delivered 
-            _logger.info('sin previous_qty_delivered if points %s resta %s  nuevo previous %s' , card.points, self.points_by_qty_delivered - self.points_by_uom_qty, self.points_by_qty_delivered)
             return True
         return False
 
@@ -81,17 +68,12 @@ class SaleOrder(models.Model):
         if self.previous_points_by_qty_delivered != self.points_by_qty_delivered: 
             card.points +=  self.points_by_qty_delivered  - self.previous_points_by_qty_delivered 
             self.previous_points_by_qty_delivered = self.points_by_qty_delivered 
-            _logger.info('qty_delivered distinto de nuevo if points %s resta %s  nuevo previous %s' , card.points, self.points_by_qty_delivered - self.points_by_uom_qty, self.points_by_qty_delivered)
         else:
             card.points = card.points
-            _logger.info('qty_delivered igual if points %s resta %s  nuevo previous %s' , card.points, self.points_by_qty_delivered - self.points_by_uom_qty, self.points_by_qty_delivered)
 
     def _apply_points_from_qty_delivered(self, card):
-        _logger.info("Points by UoM Qty: %s", self.points_by_uom_qty)
-        _logger.info("Points by Qty Delivered: %s", self.points_by_qty_delivered)
-        _logger.info("Previous Points Buffer: %s", self.previous_points_by_qty_delivered)
 
-        if not self.points_by_qty_delivered: # 10
+        if not self.points_by_qty_delivered and not self.previous_points_by_qty_delivered: 
             return False
         if self._apply_points_on_first_computed_delivery(card):
             return True
@@ -104,7 +86,6 @@ class SaleOrder(models.Model):
         card = self._get_program_card(program)
 
         self._apply_points_from_qty_delivered(card)
-        _logger.info("Card points: %s", card.points)
         return card.points
 
     def _recalculate_card_points(self):
@@ -116,7 +97,6 @@ class SaleOrder(models.Model):
         self.ensure_one()
         programs = self._get_applied_programs()
         for program in programs:
-            _logger.info("Program name: %s", program.name)
             if not self.partner_id.filtered_domain(safe_eval(program.partner_domain)):
                 continue
             status = self._program_check_compute_points(program)[program]
@@ -137,8 +117,6 @@ class SaleOrder(models.Model):
 
         # Prepare quantities
         order_lines = self._get_not_rewarded_order_lines()
-        _logger.info("Order lines: %s", order_lines)
-        _logger.info("sale order %s", order_lines.order_id.ids)
         products = order_lines.product_id
         products_qties = dict.fromkeys(products, 0)
         delivered_qtys = self.is_delivery_compute
@@ -255,9 +233,7 @@ class SaleOrder(models.Model):
                 program_result['error'] = _("This program is not available for public users.")
             if 'error' not in program_result:
                 points_result = [points] + rule_points
-                _logger.info('points result %s',points_result)
                 program_result['points'] = points_result
-        _logger.info(result)
         return result
     
     def _get_program_domain(self):
