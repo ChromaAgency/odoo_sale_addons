@@ -13,44 +13,60 @@ class SaleOrderLine(models.Model):
 
     quantity_to_add_points = fields.Float(
         string="Cantidad para añadir a puntos",
-        compute="_compute_quantity_to_add_points",
+        compute="_compute_qty_delivered",
         store=True
     )
-
+    total_quantity_computed_points = fields.Float(
+        string="Total quantity Added points",
+        store=True,        
+        compute="_compute_qty_delivered",
+    )
     previous_qty_delivered = fields.Float(
         string="Cantidad Entregada Anteriormente",
-        store=True
+        store=True,        
+        compute="_compute_qty_delivered",
+
     )
 
     @api.depends('move_ids.state', 'move_ids.scrapped', 'move_ids.quantity_done', 'move_ids.product_uom')
     def _compute_qty_delivered(self):
         for line in self:
-            line.previous_qty_delivered = line.qty_delivered
-        super(SaleOrderLine, self)._compute_qty_delivered()
-
-    
-    @api.depends('previous_qty_delivered', 'product_uom_qty')
-    def _compute_quantity_to_add_points(self):
-        for line in self:
-            if line.qty_delivered == line.product_uom_qty:
-                line.quantity_to_add_points = 0
-                continue
-            if not line.previous_qty_delivered:
+            line.previous_qty_delivered = line.qty_delivered 
+        _ =  super(SaleOrderLine, self)._compute_qty_delivered()          
+        for line in self:      
+            line.quantity_to_add_points = 0
+            if not line.order_id.is_confirm:
                 line.quantity_to_add_points = line.product_uom_qty
+                line.total_quantity_computed_points += line.product_uom_qty
                 line.order_id._recompute_program_points(line)
                 continue
-            if line.qty_delivered != line.previous_qty_delivered:
-                line.quantity_to_add_points =  line.qty_delivered - line.previous_qty_delivered
+            
+            if line.total_quantity_computed_points != line.qty_delivered:
+                quantity_to_add_points = line.qty_delivered - (line.previous_qty_delivered or line.product_uom_qty)
+                line.quantity_to_add_points = quantity_to_add_points
+                line.total_quantity_computed_points += quantity_to_add_points
                 line.order_id._recompute_program_points(line)
                 continue
-            else:
-                line.quantity_to_add_points = 0
-       
+  
+        for line in self:
+            if line.order_id.state in {'sale',  'done'}:
+                line.order_id.is_confirm = True
+            
+        return _
+
 
 
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
+    is_confirm = fields.Boolean(default=False, copy=False)
+    
+
+    def action_cancel(self):
+        _ = super().action_cancel()
+        self.is_confirm = False
+        return _
+        
     def _recompute_program_points(self, line):
         self.ensure_one()
         programs = self._get_applied_programs()
@@ -195,6 +211,12 @@ class SaleOrder(models.Model):
     
     def _get_program_domain(self):
         domain = super(SaleOrder, self)._get_program_domain()
+        programs = self.env['loyalty.program'].search([])
+        program_ids = []
+        for program in programs: 
+            if program.partner_domain and self.partner_id.filtered_domain(safe_eval(program.partner_domain)):
+                program_ids.append(program.id)
+        domain.append(('id', 'in', program_ids))
         domain.append('|')
         domain.append(('partner_ids', 'in', self.partner_id.id))
         domain.append(('partner_ids', '=', False))
