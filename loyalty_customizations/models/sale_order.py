@@ -11,8 +11,8 @@ class SaleOrderLine(models.Model):
     _inherit = "stock.picking"
 
     
-    def button_validate(self):
-        _ = super().button_validate()
+    def _action_done(self):
+        _ = super()._action_done()
         self.sale_id._recalculate_points_by_qty_delivered()
         return _
 
@@ -35,7 +35,7 @@ class SaleOrder(models.Model):
 
     def write(self, vals):
         _ = super().write(vals)
-        if 'state' in vals and vals['state'] in ['sale', 'done']:
+        if 'state' in vals and vals['state'] in ['sale', 'done'] and self:
             points = self._compute_program_points()
             self.points_by_uom_qty = points
         return _
@@ -58,14 +58,14 @@ class SaleOrder(models.Model):
         return program.coupon_ids.filtered(lambda c: c.partner_id == self.partner_id)
     
     def _apply_points_on_first_computed_delivery(self, card):
-        if not self.previous_points_by_qty_delivered: 
+        if not self.previous_points_by_qty_delivered:
             card.points += self.points_by_qty_delivered - self.points_by_uom_qty 
             self.previous_points_by_qty_delivered = self.points_by_qty_delivered 
             return True
         return False
 
     def _apply_points_on_subsequent_computed_deliveries(self, card):
-        if self.previous_points_by_qty_delivered != self.points_by_qty_delivered: 
+        if self.previous_points_by_qty_delivered != self.points_by_qty_delivered:
             card.points +=  self.points_by_qty_delivered  - self.previous_points_by_qty_delivered 
             self.previous_points_by_qty_delivered = self.points_by_qty_delivered 
         else:
@@ -125,6 +125,7 @@ class SaleOrder(models.Model):
                 products_qties[line.product_id] += line.qty_delivered
             else:
                 products_qties[line.product_id] += line.product_uom_qty
+        
         # Contains the products that can be applied per rule
         products_per_rule = programs._get_valid_products(products)
 
