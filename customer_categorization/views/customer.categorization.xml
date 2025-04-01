@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="customer_point_categorization_type_action" model="ir.actions.act_window">
+        <field name="name">Action Name</field>
+        <field name="res_model">customer.point.categorization.type</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+<record id="customer_point_categorization_type_view_form" model="ir.ui.view">
+    <field name="name">customer.point.categorization.type.view.form</field>
+    <field name="model">customer.point.categorization.type</field>
+    <field name="arch" type="xml">
+        <form string="">
+            <sheet>
+                <group>
+                    <field name="name" />
+                    <field name="min_points" />
+                </group>
+            </sheet>
+        </form>
+    </field>
+</record>
+<menuitem
+    id="client_categorization_menu"
+    name="Categorias de cliente"
+    action="customer_categorization.customer_point_categorization_type_action"
+    parent="contacts.menu_contacts"
+    sequence="10"/>
+</odoo>

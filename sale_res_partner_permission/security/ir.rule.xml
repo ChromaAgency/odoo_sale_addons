@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="see_all_account_orders" model="ir.rule">
+        <field name="name">Ventas: Ver todos los documentos de cuenta</field>
+        <field name="model_id" ref="sale.model_sale_order" />
+        <field name="groups" eval="[(4, ref('group_show_all_partner_documents'))]" />
+        <field name="domain_force">['|','|',('user_id','=',user.id),('user_id','=',False),'|',('partner_id.user_id','=',user.id), ('partner_id.commercial_partner_id.user_id','=',user.id)]</field>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="0"/>
+        <field name="perm_create" eval="0"/>
+        <field name="perm_unlink" eval="0"/>
+    </record>
+    <record id="see_all_account_orders_lines" model="ir.rule">
+        <field name="name">Ventas: Ver todos los documentos de cuenta</field>
+        <field name="model_id" ref="sale.model_sale_order_line" />
+        <field name="groups" eval="[(4, ref('group_show_all_partner_documents'))]" />
+        <field name="domain_force">['|','|',('order_id.user_id','=',user.id),('order_id.user_id','=',False),'|',('order_id.partner_id.user_id','=',user.id), ('order_id.partner_id.commercial_partner_id.user_id','=',user.id)]</field>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="0"/>
+        <field name="perm_create" eval="0"/>
+        <field name="perm_unlink" eval="0"/>
+    </record>
+    <record id="see_all_account_orders_leads" model="ir.rule">
+        <field name="name">CRM: Ver todos los documentos de cuenta</field>
+        <field name="model_id" ref="crm.model_crm_lead" />
+        <field name="groups" eval="[(4, ref('group_show_all_partner_documents'))]" />
+        <field name="domain_force">['|','|',('user_id','=',user.id),('user_id','=',False),'|',('partner_id.user_id','=',user.id), ('partner_id.commercial_partner_id.user_id','=',user.id)]</field>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="0"/>
+        <field name="perm_create" eval="0"/>
+        <field name="perm_unlink" eval="0"/>
+    </record>
+
+</odoo>

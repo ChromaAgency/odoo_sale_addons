@@ -1,0 +1,1 @@
+from . import res_partners, account_move
