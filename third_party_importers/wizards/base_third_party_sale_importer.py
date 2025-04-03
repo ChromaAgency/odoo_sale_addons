@@ -288,8 +288,9 @@ class BaseThirdPartySaleImporter(TransientModel):
     def _get_product_name(self, product):
         return product.display_name
     
-    def _get_product_price_unit(self, row):
-        return row[self.price_unit_field] / 1.21 if self.is_tax_included else row[self.price_unit_field]
+    def _get_product_price_unit(self, row, product):
+        product_tax_amount = product.taxes_id[0].amount if product.taxes_id else 21
+        return row[self.price_unit_field] / (1 + (product_tax_amount/100)) if self.is_tax_included else row[self.price_unit_field]
     
     def _prepare_sale_order_items(self, row):
         product = self.search_product(row)
@@ -297,7 +298,7 @@ class BaseThirdPartySaleImporter(TransientModel):
             "product_id": product.id,
             "product_uom_qty": row[self.product_uom_qty_field],
             # TODO We should dynamically get the tax value from the product
-            "price_unit": self._get_product_price_unit(row),
+            "price_unit": self._get_product_price_unit(row,product),
             "name": self._get_product_name(product),
         }
         if self.delivery_type_field and 'full' in str(row[self.delivery_type_field]).lower():
@@ -312,17 +313,19 @@ class BaseThirdPartySaleImporter(TransientModel):
     
     def _add_shipping_cost(self, row):
         shipping_product = self.env['product.template'].search([('default_code', 'ilike', 'Delivery')])[0]
+        product_tax_amount = shipping_product.taxes_id[0].amount if shipping_product.taxes_id else 21
         return {
             "name": "Envío",
             "product_id": shipping_product.id,
-            "price_unit": row[self.shipping_cost] / 1.21 if self.is_tax_included else row[self.shipping_cost]
+            "price_unit": row[self.shipping_cost] / (1 + (product_tax_amount/100)) if self.is_tax_included else row[self.shipping_cost]
         }
     def _add_discount(self, row):
         discount_product = self.env['product.template'].search([('default_code', '=', 'DiscountLine')])
+        product_tax_amount = discount_product.taxes_id[0].amount if discount_product.taxes_id else 21
         return {
             "name": "Descuento",
             "product_id": discount_product.id,
-            "price_unit": (row[self.discount] / 1.21 if self.is_tax_included else row[self.discount]) * -1
+            "price_unit": (row[self.discount] / (1 + (product_tax_amount/100)) if self.is_tax_included else row[self.discount]) * -1
         }
     
     def _prepare_sale_order(self, row, items: list, partner):
