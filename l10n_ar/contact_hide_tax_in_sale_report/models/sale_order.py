@@ -1,4 +1,5 @@
 from odoo.models import Model 
+from odoo.fields import Boolean
 
 class ResPartner(Model):
     _inherit = 'res.partner'
