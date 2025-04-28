@@ -5,6 +5,8 @@
         <xpath expr="//table[@class='table table-sm']/thead/tr/t/th[last()]" position="after">
             <th>Con impuestos (<span t-out="qty"/>)</th>
         </xpath>
+        <xpath expr="//table[@class='table table-sm']/thead/tr/t/th" position="replace">
+        </xpath>
 
         <!-- Find the table body row and add the corresponding cell for the new column -->
         <!-- We will compute the price with tax here -->
@@ -17,6 +19,8 @@
                     <t t-set="tax_info" t-value="taxes.compute_all(product['price'][qty], pricelist.currency_id, 1, product=product_rec)"/>
                     <span t-esc="round(tax_info['total_included'])" t-options="{'widget': 'monetary', 'display_currency': pricelist.currency_id}"/>
             </td>
+        </xpath>
+        <xpath expr="//table[@class='table table-sm']/tbody/t/tr/t/td" position="replace">
         </xpath>
     </template>
 </odoo>
