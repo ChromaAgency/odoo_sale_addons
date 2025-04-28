@@ -2,20 +2,20 @@
 <odoo>
     <template id="report_pricelist_with_iva" inherit_id="product.report_pricelist_page">
         <!-- Find the table header and add a new column for "Price with Tax" -->
-        <xpath expr="//table[@class='table table-sm']/thead/tr/th[last()]" position="after">
-            <th>Price with Tax</th>
+        <xpath expr="//table[@class='table table-sm']/thead/tr/t/th[last()]" position="after">
+            <th>Con impuestos (<span t-out="qty"/>)</th>
         </xpath>
 
         <!-- Find the table body row and add the corresponding cell for the new column -->
         <!-- We will compute the price with tax here -->
-        <xpath expr="//table[@class='table table-sm']/tbody/t/tr/td[last()]" position="after">
+        <xpath expr="//table[@class='table table-sm']/tbody/t/tr/t/td[last()]" position="after">
             <td>
                     <t t-set="product_rec" t-value="env['product.template'].browse(product['id'])" />
                     <!-- Get taxes defined on the product -->
                     <t t-set="taxes" t-value="product_rec.taxes_id.filtered(lambda t: t.company_id == (product_rec.company_id or env.company) )"/>
                     <!-- Compute price with tax. Note: This uses default taxes. For specific partner/fiscal position, logic would be more complex -->
                     <t t-set="tax_info" t-value="taxes.compute_all(product['price'][qty], pricelist.currency_id, 1, product=product_rec)"/>
-                    <span t-esc="tax_info['total_included']" t-options="{'widget': 'monetary', 'display_currency': pricelist.currency_id}"/>
+                    <span t-esc="round(tax_info['total_included'])" t-options="{'widget': 'monetary', 'display_currency': pricelist.currency_id}"/>
             </td>
         </xpath>
     </template>
