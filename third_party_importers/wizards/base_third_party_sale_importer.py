@@ -314,12 +314,6 @@ class BaseThirdPartySaleImporter(TransientModel):
     
     def _add_shipping_cost(self, row, items=[]):
             
-        min_free_delivery = float(self.env['ir.config_parameter'].sudo().get_param('third_party_importers.min_amount_free_delivery', '0.0'))
-        order_amount = sum([item[2]['price_unit'] * item[2]['product_uom_qty'] for item in items])
-        
-        if min_free_delivery and order_amount >= min_free_delivery:
-            return False
-            
         shipping_product = self.env['product.template'].search([('default_code', 'ilike', 'Delivery')])[0]
         product_tax_amount = shipping_product.taxes_id[0].amount if shipping_product.taxes_id else 21
         return {
