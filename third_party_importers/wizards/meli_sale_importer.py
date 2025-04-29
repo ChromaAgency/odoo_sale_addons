@@ -38,7 +38,7 @@ class MeliSaleImporter(TransientModel):
             
         min_free_delivery = float(self.env['ir.config_parameter'].sudo().get_param('third_party_importers.min_amount_free_delivery', '0.0'))
         order_amount = sum([item[2]['price_unit'] * item[2]['product_uom_qty'] for item in items])
-        is_meli_flex = row[self.delivery_type_field] == 'Flex'
+        is_meli_flex = row[self.delivery_type_field] == 'Mercado Envíos Flex'
         if min_free_delivery and order_amount >= min_free_delivery and is_meli_flex:
             return False
 
