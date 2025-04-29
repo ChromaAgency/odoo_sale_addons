@@ -299,7 +299,6 @@ class BaseThirdPartySaleImporter(TransientModel):
         sale_order_items = {
             "product_id": product.id,
             "product_uom_qty": row[self.product_uom_qty_field],
-            # TODO We should dynamically get the tax value from the product
             "price_unit": self._get_product_price_unit(row,product),
             "name": self._get_product_name(product),
         }
@@ -313,7 +312,14 @@ class BaseThirdPartySaleImporter(TransientModel):
     def _get_date_order(self, row):
         return datetime.strptime(str(row[self.date_order_field]), self.date_strptime_format).strftime("%Y-%m-%d %H:%M:%S")
     
-    def _add_shipping_cost(self, row):
+    def _add_shipping_cost(self, row, items=[]):
+            
+        min_free_delivery = float(self.env['ir.config_parameter'].sudo().get_param('third_party_importers.min_amount_free_delivery', '0.0'))
+        order_amount = sum([item[2]['price_unit'] * item[2]['product_uom_qty'] for item in items])
+        
+        if min_free_delivery and order_amount >= min_free_delivery:
+            return False
+            
         shipping_product = self.env['product.template'].search([('default_code', 'ilike', 'Delivery')])[0]
         product_tax_amount = shipping_product.taxes_id[0].amount if shipping_product.taxes_id else 21
         return {
@@ -337,14 +343,17 @@ class BaseThirdPartySaleImporter(TransientModel):
         has_shipping_line = any(
         isinstance(item, tuple) and isinstance(item[2], dict) and item[2].get("name") == "Envío"
         for item in items
-    )
+        )
 
-        if self.shipping_cost and row[self.shipping_cost] > 0.0 and not has_shipping_line:
-            shipping_line = self._add_shipping_cost(row)
-            items.append(Command.create(shipping_line))
+        if has_shipping_line:
+            items = [item for item in items if not (isinstance(item, tuple) and isinstance(item[2], dict) and item[2].get("name") == "Envío")]
         if self.discount and row[self.discount] > 0.0:
             discount_line = self._add_discount(row)
             items.append(Command.create(discount_line))
+        if self.shipping_cost and row[self.shipping_cost] > 0.0:
+            shipping_line = self._add_shipping_cost(row, items)
+            if shipping_line:
+                items.append(Command.create(shipping_line))
         sale_order_values = {
             'client_order_ref': row[self.ref_field] if self.ref_field else False,
             'tp_username': row[self.username_field] if self.username_field else False,
