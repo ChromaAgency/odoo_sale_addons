@@ -313,7 +313,6 @@ class BaseThirdPartySaleImporter(TransientModel):
         return datetime.strptime(str(row[self.date_order_field]), self.date_strptime_format).strftime("%Y-%m-%d %H:%M:%S")
     
     def _add_shipping_cost(self, row, items=[]):
-            
         shipping_product = self.env['product.template'].search([('default_code', 'ilike', 'Delivery')])[0]
         product_tax_amount = shipping_product.taxes_id[0].amount if shipping_product.taxes_id else 21
         return {
