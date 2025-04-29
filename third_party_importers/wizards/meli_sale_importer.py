@@ -45,7 +45,13 @@ class MeliSaleImporter(TransientModel):
     def _add_shipping_cost(self, row, items=[]):
             
         min_free_delivery = float(self.env['ir.config_parameter'].sudo().get_param('third_party_importers.min_amount_free_delivery', '0.0'))
-        order_amount = sum([item[2]['price_unit'] * item[2]['product_uom_qty'] for item in items])
+        items_subtotals = []
+        for item in items:
+            product = self.env['product.product'].sudo().browse(item[2]['product_id'] )
+            product_tax_amount = product.taxes_id[0].amount if product.taxes_id else 21
+
+            items_subtotals.append((item[2]['price_unit'] * (1 + (product_tax_amount/100)))  * item[2]['product_uom_qty'] )
+        order_amount = sum(items_subtotals)
         is_meli_flex = row[self.delivery_type_field] == 'Mercado Envíos Flex'
         if min_free_delivery and order_amount >= min_free_delivery and is_meli_flex:
             return False
