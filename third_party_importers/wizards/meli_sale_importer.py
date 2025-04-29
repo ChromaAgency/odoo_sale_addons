@@ -34,6 +34,14 @@ class MeliSaleImporter(TransientModel):
             row[self.date_order_field] = cart_row[self.date_order_field]
         return row
     
+    def _get_afip_responsability_type(self, row):
+        if self.afip_responsability_type_field:
+            # Cambiar a code para meli
+            responsability_type = self.env['l10n_ar.afip.responsibility.type'].sudo().search([('code', '=',  row[self.afip_responsability_type_field] )], limit=1).id
+            if responsability_type:
+                return responsability_type
+        return super()._get_afip_responsability_type(row)
+    
     def _add_shipping_cost(self, row, items=[]):
             
         min_free_delivery = float(self.env['ir.config_parameter'].sudo().get_param('third_party_importers.min_amount_free_delivery', '0.0'))
