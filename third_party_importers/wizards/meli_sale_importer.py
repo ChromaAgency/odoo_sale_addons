@@ -34,6 +34,13 @@ class MeliSaleImporter(TransientModel):
             row[self.date_order_field] = cart_row[self.date_order_field]
         return row
 
+    def _get_afip_responsability_type(self, row):
+        if self.afip_responsability_type_field:
+            responsability_type = self.env['l10n_ar.afip.responsibility.type'].sudo().search([('code', '=',  row[self.afip_responsability_type_field] )], limit=1).id
+            if responsability_type:
+                return responsability_type
+        return super()._get_afip_responsability_type(row)
+        
     def _add_fields_to_cart_items_and_erase_cart_line(self, df:pd.DataFrame):
         df_to_add_fields = df[df[MELI_FIELD_TO_SEARCH_CART_ITEMS].isna()]
         indexes = list(df_to_add_fields.index)
