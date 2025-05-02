@@ -3,7 +3,7 @@
     <template id="report_pricelist_with_iva" inherit_id="product.report_pricelist_page">
         <!-- Find the table header and add a new column for "Price with Tax" -->
         <xpath expr="//table[@class='table table-sm']/thead/tr/t/th[last()]" position="after">
-            <th>Con impuestos (<span t-out="qty"/>)</th>
+            <th>Precio (<span t-out="qty"/>)</th>
         </xpath>
         <xpath expr="//table[@class='table table-sm']/thead/tr/t/th" position="replace">
         </xpath>
