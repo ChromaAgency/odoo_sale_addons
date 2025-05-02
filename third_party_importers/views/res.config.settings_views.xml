@@ -3,13 +3,12 @@
     <record id="view_res_config_settings_form_inherit_third_party" model="ir.ui.view">
         <field name="name">res.config.settings.form.inherit.third.party</field>
         <field name="model">res.config.settings</field>
-        <!-- Adjust the inherit_id to match the view you want to extend -->
         <field name="inherit_id" ref="sale.res_config_settings_view_form"/>
         <field name="arch" type="xml">
-            <!-- Locate the sale settings block and insert the field -->
             <block id="connectors_setting_container" position="inside">
                 <div class="row mt16 o_settings_container">
                     <field name="third_party_account_journal_id" string="Diario de pago"/>
+                    <field name="min_amount_free_delivery" string="Minimum Amount for Free Delivery"/>
                 </div>
             </block>
         </field>
