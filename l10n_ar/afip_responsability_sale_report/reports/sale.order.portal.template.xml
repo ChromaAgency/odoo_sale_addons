@@ -15,7 +15,7 @@
             <xpath expr="//td[@name='td_priceunit']" position="replace">
                 <td name="td_priceunit" class="text-end">
                     <t t-set="discount_rate" t-value="1-(line.discount/100)" />
-                    <t t-set="tax_per_unit" t-value="line.price_tax/line.product_uom_qty" />
+                    <t t-set="tax_per_unit" t-value="line.price_tax/line.product_uom_qty if line.product_uom_qty != 0 else 1 "/>
                     <span class="td_priceunit">
                         <t t-if="discount_rate != 0">
                             <t t-esc="line.price_unit + (tax_per_unit/discount_rate)"
