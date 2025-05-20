@@ -257,9 +257,11 @@ class BaseThirdPartySaleImporter(TransientModel):
     def _search_state(self, state):
         if len(state) > 1:
             if state == 'Gran Buenos Aires':
-                state = 'Buenos Aires'
+                return self.env.ref('base.state_ar_b').id
             if state == 'Capital Federal':
-                return  self.env.ref('base.state_ar_c').id
+                return self.env.ref('base.state_ar_c').id
+            if state == 'Santiago del Estero':
+                return self.env.ref('base.state_ar_g').id
             state_id = self.env['res.country.state'].search([('name', '=', state), ('country_id', '=', self.env.ref('base.ar').id)]).id
             if not state_id:
                 state_id = self.env['res.country.state'].search([('name', 'like', state), ('country_id', '=', self.env.ref('base.ar').id)]).id
