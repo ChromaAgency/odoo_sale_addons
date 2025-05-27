@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Modify Product Template Page -->
+    <template id="product_template_hide_price" inherit_id="website_sale.product_template">
+        <xpath expr="//div[@id='add_to_cart_wrap']" position="attributes">
+            <attribute name="t-if">not website.catalog_mode and not website.hide_price and not website.prevent_add_to_cart</attribute>
+        </xpath>
+        <xpath expr="//div[@itemprop='offers']" position="attributes">
+            <attribute name="t-if">not website.catalog_mode and not website.hide_price</attribute>
+        </xpath>
+    </template>
+
+    <!-- Modify Shop Page -->
+    <template id="products_item_hide_price" inherit_id="website_sale.products_item">
+        <xpath expr="//div[hasclass('product_price')]" position="attributes">
+            <attribute name="t-if">not website.catalog_mode and not website.hide_price</attribute>
+        </xpath>
+        <xpath expr="//a[@id='add_to_cart']" position="attributes">
+            <attribute name="t-if">not website.catalog_mode and not website.prevent_add_to_cart</attribute>
+        </xpath>
+    </template>
+
+    <!-- Modify Products List View -->
+    <template id="products_list_view_hide_price" inherit_id="website_sale.products_list_view">
+        <xpath expr="//div[hasclass('o_wsale_product_price')]" position="attributes">
+            <attribute name="t-if">not website.catalog_mode and not website.hide_price</attribute>
+        </xpath>
+        <xpath expr="//a[hasclass('o_add_wishlist')]" position="attributes">
+            <attribute name="t-if">not website.catalog_mode and not website.prevent_add_to_cart</attribute>
+        </xpath>
+    </template>
+</odoo>
