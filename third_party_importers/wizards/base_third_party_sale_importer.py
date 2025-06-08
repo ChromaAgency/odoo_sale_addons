@@ -217,6 +217,8 @@ class BaseThirdPartySaleImporter(TransientModel):
             responsability_type = self.env['l10n_ar.afip.responsibility.type'].sudo().search([('name', 'like',  row[self.afip_responsability_type_field] )], limit=1).id
             if responsability_type:
                 return responsability_type
+        if row[self.afip_responsability_type_field] == "IVA Exento":
+            return self.env.ref('l10n_ar.res_IVAE').id
         return self.env['l10n_ar.afip.responsibility.type'].sudo().search([('name', 'like',  "Consumidor Final" )], limit=1).id
     
     def _get_identification_type_id(self, row):
