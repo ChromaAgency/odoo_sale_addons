@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+        <!-- Delivery Carriers -->
+        <menuitem id="menu_res_carriers" name="Delivery" parent="stock.menu_stock_config_settings" groups="stock.group_stock_manager" sequence="50"/>
+
+
+        <record id="view_res_carrier_tree" model="ir.ui.view">
+            <field name="name">delivery.carrier.express.tree</field>
+            <field name="model">delivery.carrier.express</field>
+            <field name="arch" type="xml">
+                <tree string="Expresos">
+                    <field name="sequence" widget="handle"/>
+                    <field name="name"/>
+                    <field name="company_name"/>
+                    <field name="street"/>
+                    <field name="city"/>
+                    <field name="phone"/>
+                    <field name="mobile"/>
+                    <field name="email"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_res_carrier_search" model="ir.ui.view">
+            <field name="name">delivery.carrier.express.search</field>
+            <field name="model">delivery.carrier.express</field>
+            <field name="arch" type="xml">
+                <search string="Expresos">
+                    <field name="name" string="Nombre del Expreso" />
+                    <separator/>
+                    <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+                </search>
+            </field>
+        </record>
+
+        <record id="view_res_carrier_form" model="ir.ui.view">
+            <field name="name">delivery.carrier.express.form</field>
+            <field name="model">delivery.carrier.express</field>
+            <field name="arch" type="xml">
+                <form string="Expresos">
+                    <sheet>
+                        <div class="oe_title" name="title">
+                            <label for="name" string="Name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name" placeholder="e.g. Fast Express"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group name="domicilio">
+                                <field name="active"/>
+                                <field name="street" placeholder="Dirección" string="Domicilio"/>
+                                <field name="city" placeholder="Ciudad"/>
+                                <field name="state_id" />
+                                <field name="zip" />
+                                <field name="country_id" />
+                            </group>
+                            <group name="contacto">
+                                <field name="phone"/>
+                                <field name="mobile"/>
+                                <field name="email"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_res_carrier_form" model="ir.actions.act_window">
+            <field name="name">Expresos</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">delivery.carrier.express</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem action="action_res_carrier_form" id="menu_action_res_carrier_form" parent="menu_res_carriers" sequence="1"/>
+        <menuitem action="action_res_carrier_form" id="sale_menu_action_res_carrier_form" parent="sale.menu_sales_config" sequence="4"/>
+
+</odoo>

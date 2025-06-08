@@ -1,0 +1,1 @@
+from . import res_partner, customer_point_categorization_type, customer_categorization, product_pricelist
