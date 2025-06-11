@@ -1,32 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- Modify Product Template Page -->
-    <template id="product_template_hide_price" inherit_id="website_sale.product_template">
+    <template id="product_template_hide_price" inherit_id="website_sale.product">
         <xpath expr="//div[@id='add_to_cart_wrap']" position="attributes">
-            <attribute name="t-if">not website.catalog_mode and not website.hide_price and not website.prevent_add_to_cart</attribute>
-        </xpath>
-        <xpath expr="//div[@itemprop='offers']" position="attributes">
-            <attribute name="t-if">not website.catalog_mode and not website.hide_price</attribute>
+            <attribute name="t-if">not catalog_mode and not hide_price and not prevent_add_to_cart</attribute>
         </xpath>
     </template>
 
     <!-- Modify Shop Page -->
     <template id="products_item_hide_price" inherit_id="website_sale.products_item">
         <xpath expr="//div[hasclass('product_price')]" position="attributes">
-            <attribute name="t-if">not website.catalog_mode and not website.hide_price</attribute>
+            <attribute name="t-if">not catalog_mode and not hide_price</attribute>
         </xpath>
-        <xpath expr="//a[@id='add_to_cart']" position="attributes">
-            <attribute name="t-if">not website.catalog_mode and not website.prevent_add_to_cart</attribute>
+        <xpath expr='//div[hasclass("o_wsale_product_sub")]' position="attributes">
+            <attribute name="t-if">not catalog_mode and not hide_price</attribute>
         </xpath>
+        <xpath expr="//t[@t-set='product_href']" position="after">
+            <t t-set="product_href" t-value="'#'" t-if="catalog_mode"/>
+        </xpath>
+
     </template>
 
     <!-- Modify Products List View -->
     <template id="products_list_view_hide_price" inherit_id="website_sale.products_list_view">
         <xpath expr="//div[hasclass('o_wsale_product_price')]" position="attributes">
-            <attribute name="t-if">not website.catalog_mode and not website.hide_price</attribute>
+            <attribute name="t-if">not catalog_mode and not hide_price</attribute>
         </xpath>
-        <xpath expr="//a[hasclass('o_add_wishlist')]" position="attributes">
-            <attribute name="t-if">not website.catalog_mode and not website.prevent_add_to_cart</attribute>
+    </template>
+
+    <template id="filter_products_price" name="Filter productos prices" inherit_id="website_sale.filter_products_price">
+        <xpath expr="//div[@id='o_wsale_price_range_option']" position="attributes">
+            <attribute name="t-if"  >not catalog_mode</attribute>
         </xpath>
     </template>
 </odoo>
