@@ -81,7 +81,7 @@ class MeliSaleImporter(TransientModel):
 
     @property
     def ref_field(self):
-        return "Cobro Aprobado"
+        return "# de venta"
     
     @property
     def username_field(self):
