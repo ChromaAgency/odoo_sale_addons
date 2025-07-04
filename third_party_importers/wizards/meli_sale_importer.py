@@ -4,7 +4,7 @@ import pandas as pd
 import logging
 _logger = logging.getLogger(__name__)
 from odoo.exceptions import UserError
-MELI_FIELD_TO_SEARCH_CART_ITEMS = "Ingresos por productos (ARS)"
+MELI_FIELD_TO_SEARCH_CART_ITEMS = "DNI"
 
 def search_cart_row_in_df(df:pd.DataFrame, index, indexes):
     previous_index = index-1
@@ -63,7 +63,7 @@ class MeliSaleImporter(TransientModel):
         return super()._add_shipping_cost(row, items)
         
     def _add_fields_to_cart_items_and_erase_cart_line(self, df:pd.DataFrame):
-        df_to_add_fields = df[df[MELI_FIELD_TO_SEARCH_CART_ITEMS].isna()]
+        df_to_add_fields = df[df[MELI_FIELD_TO_SEARCH_CART_ITEMS].eq(" ")]
         indexes = list(df_to_add_fields.index)
         r_df = df.apply(lambda index: self.modify_df_with_cart_values(index, indexes, df), axis=1)
         return r_df[~r_df[self.product_code_field].eq(" ")]
@@ -81,7 +81,7 @@ class MeliSaleImporter(TransientModel):
 
     @property
     def ref_field(self):
-        return "Cobro Aprobado"
+        return "# de venta"
     
     @property
     def username_field(self):
