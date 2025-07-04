@@ -4,7 +4,7 @@ import pandas as pd
 import logging
 _logger = logging.getLogger(__name__)
 from odoo.exceptions import UserError
-MELI_FIELD_TO_SEARCH_CART_ITEMS = "Ingresos por productos (ARS)"
+MELI_FIELD_TO_SEARCH_CART_ITEMS = "DNI"
 
 def search_cart_row_in_df(df:pd.DataFrame, index, indexes):
     previous_index = index-1
@@ -32,6 +32,7 @@ class MeliSaleImporter(TransientModel):
             row[self.shipping_cost] = cart_row[self.shipping_cost]
             row[self.username_field] = cart_row[self.username_field]
             row[self.date_order_field] = cart_row[self.date_order_field]
+            row['Ingresos por productos (ARS)'] = cart_row['Ingresos por productos (ARS)']
         return row
     
     def _get_afip_responsability_type(self, row):
@@ -63,14 +64,39 @@ class MeliSaleImporter(TransientModel):
         return super()._add_shipping_cost(row, items)
         
     def _add_fields_to_cart_items_and_erase_cart_line(self, df:pd.DataFrame):
-        df_to_add_fields = df[df[MELI_FIELD_TO_SEARCH_CART_ITEMS].isna()]
+        df_to_add_fields = df[df[MELI_FIELD_TO_SEARCH_CART_ITEMS].eq(" ")]
         indexes = list(df_to_add_fields.index)
         r_df = df.apply(lambda index: self.modify_df_with_cart_values(index, indexes, df), axis=1)
         return r_df[~r_df[self.product_code_field].eq(" ")]
 
     def _preprocess_df(self, df:pd.DataFrame):
         df = self._add_fields_to_cart_items_and_erase_cart_line(df)
+        self._validate_required_fields(df)
         return df
+    
+    def _validate_required_fields(self, df: pd.DataFrame):
+        income_field = "Ingresos por productos (ARS)"
+        
+        if income_field not in df.columns:
+            raise UserError(f"La columna '{income_field}' no existe en el archivo.")
+        
+        empty_income_mask = (
+            df[income_field].isna() | 
+            (df[income_field] == '') | 
+            (df[income_field] == 0)
+        )
+        
+        if empty_income_mask.any():
+            problematic_rows = df[empty_income_mask]
+            order_numbers = problematic_rows[self.order_name_field].unique()
+            
+            _logger.error(f"VALIDACIÓN FALLIDA: {len(problematic_rows)} líneas sin 'Ingresos por productos (ARS)'")
+            for idx, row in problematic_rows.iterrows():
+                _logger.error(f"Orden: {row[self.order_name_field]}, SKU: {row[self.product_code_field]}, Ingresos: {row[income_field]}")
+            
+            raise UserError(f"Error: Las siguientes órdenes no tienen 'Ingresos por productos (ARS)': {', '.join(map(str, order_numbers))}")
+        
+        _logger.info(f"✓ Validación exitosa: {len(df)} líneas verificadas, todas tienen ingresos por productos.")
 
     def _get_date_order(self, row):
         return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -81,7 +107,7 @@ class MeliSaleImporter(TransientModel):
 
     @property
     def ref_field(self):
-        return "Cobro Aprobado"
+        return "# de venta"
     
     @property
     def username_field(self):
